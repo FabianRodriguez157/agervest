@@ -21,8 +21,8 @@ services:
     runtime: node
     plan: free
     rootDir: backend
-    buildCommand: npm install --include=dev && npm run build
-    startCommand: node dist/server.js
+    buildCommand: npm install --include=dev && npm run build && npm run db:migrate
+    startCommand: npm run db:seed; node dist/server.js
     envVars:
       - key: NODE_ENV
         value: production
