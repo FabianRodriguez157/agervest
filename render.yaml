@@ -41,4 +41,4 @@ services:
       - key: BCRYPT_ROUNDS
         value: 10
       - key: CORS_ORIGINS
-        value: https://CAMBIAME.github.io
+        value: https://fabianrodriguez157.github.io
