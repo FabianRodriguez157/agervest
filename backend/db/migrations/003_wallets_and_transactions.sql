@@ -71,7 +71,22 @@ FROM users u
 JOIN farmers f ON f.user_id = u.id
 WHERE u.role = 'farmer';
 
--- Recrea funciones que dependen de v_farmer
+-- Recrea funciones que dependen de v_farmer (DROP primero porque cambia el tipo de retorno)
+DO $$
+DECLARE r record;
+BEGIN
+    FOR r IN
+        SELECT oid::regprocedure::text AS sig
+        FROM pg_proc
+        WHERE proname IN (
+            'fn_farmer_get', 'fn_farmer_list', 'fn_farmer_auth_by_email',
+            'fn_farmer_mark_validated', 'fn_farmer_create'
+        )
+    LOOP
+        EXECUTE 'DROP FUNCTION ' || r.sig || ' CASCADE';
+    END LOOP;
+END $$;
+
 CREATE OR REPLACE FUNCTION fn_farmer_get(p_id UUID)
 RETURNS SETOF v_farmer LANGUAGE sql STABLE AS $$
     SELECT * FROM v_farmer WHERE id = p_id;
