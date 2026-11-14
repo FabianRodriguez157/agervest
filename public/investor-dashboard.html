@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel del inversionista — AgerVest</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<nav class="topbar" id="navbar"></nav>
+
+<section class="section">
+  <div class="container" id="content"><div class="loading">Cargando panel…</div></div>
+</section>
+
+<footer id="footer"></footer>
+<script src="js/config.js"></script>
+<script src="js/common.js"></script>
+<script src="js/api-client.js"></script>
+<script src="js/agervest-v3-data.js"></script>
+<script src="js/agervest-analytics.js"></script>
+<script>
+renderNavbar('investor-dash');
+
+async function load() {
+  const content = document.getElementById('content');
+  try {
+    const me = await AgerVestAPI.me();
+    if (me.role !== 'investor') {
+      window.location.href = me.role === 'farmer' ? 'farmer-dashboard.html' : 'login.html';
+      return;
+    }
+    const investorId = me.user.id;
+    Session.setInvestor(investorId, me.user.name);
+    const data = await AgerVestAPI.getInvestorPortfolio(investorId);
+    const allProjects = await AgerVestAPI.listProjects();
+    const { investor, investments, totalInvested, totalExpectedReturn, projectsFunded, pendingReturns, transactions } = data;
+    content.innerHTML = `
+    <div class="dash-header">
+      <div class="who">
+        <div class="avatar">${initials(investor.name)}</div>
+        <div><h1>${investor.name}</h1><div class="sub">${investor.email}</div></div>
+      </div>
+      <a href="catalog.html" class="btn btn-primary">+ Nueva inversión</a>
+    </div>
+
+    <div class="kpi-row">
+      <div class="card kpi-card"><div class="l">Saldo disponible</div><div class="v gold">${fmtMoney(investor.walletBalance)}</div></div>
+      <div class="card kpi-card"><div class="l">Total invertido</div><div class="v">${fmtMoney(totalInvested)}</div></div>
+      <div class="card kpi-card"><div class="l">Retorno esperado total</div><div class="v" style="color:var(--agv-green);">${fmtMoney(totalExpectedReturn)}</div></div>
+      <div class="card kpi-card"><div class="l">Proyectos financiados</div><div class="v">${projectsFunded}</div></div>
+    </div>
+
+    <div class="kpi-row v3-mini-kpis">
+      <div class="card kpi-card"><div class="l">Proyectos disponibles</div><div class="v">${allProjects.length}</div></div>
+      <div class="card kpi-card"><div class="l">Confianza promedio</div><div class="v">${allProjects.length ? Math.round(allProjects.reduce((a,p)=>a+(p.confidenceIndex || 0),0)/allProjects.length) : 0}/100</div></div>
+      <div class="card kpi-card"><div class="l">Región de referencia</div><div class="v">Arequipa</div></div>
+      <div class="card kpi-card"><div class="l">Estado de cuenta</div><div class="v">${investor.verified ? 'Verificada' : 'Pendiente'}</div></div>
+    </div>
+
+    <div class="dashboard-insights">
+      <div class="insight-card highlight">
+        <div class="insight-head"><h3 class="insight-title">Perfil de inversión</h3><span class="insight-icon">🎯</span></div>
+        <div class="insight-value">${({conservador:'Conservador',moderado:'Moderado',agresivo:'Agresivo'}[investor.riskProfile] || 'Moderado')}</div>
+        <p class="insight-copy">Perfil declarado al registrarte. Úsalo como referencia, no como recomendación de inversión.</p>
+        <div class="quick-actions"><span class="status-summary">● Perfil registrado</span></div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-head"><h3 class="insight-title">Capital utilizado</h3><span class="insight-icon">💼</span></div>
+        <div class="insight-value">${fmtMoney(totalInvested)}</div>
+        <p class="insight-copy">Capital invertido actualmente en proyectos de tu portafolio.</p>
+        <div class="dashboard-progress-label"><span>Uso del presupuesto declarado</span><b>${investor.investmentBudget ? Math.min(100, Math.round(totalInvested / investor.investmentBudget * 100)) : 0}%</b></div>
+        <div class="progress-bar"><div class="fill" style="width:${investor.investmentBudget ? Math.min(100, Math.round(totalInvested / investor.investmentBudget * 100)) : 0}%"></div></div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-head"><h3 class="insight-title">Diversificación</h3><span class="insight-icon">📊</span></div>
+        <div class="insight-value">${projectsFunded} proyecto${projectsFunded === 1 ? '' : 's'}</div>
+        <p class="insight-copy">${projectsFunded ? 'Tu portafolio contiene inversiones distribuidas entre oportunidades agrícolas.' : 'Aún no tienes inversiones registradas en tu portafolio.'}</p>
+        <div class="quick-actions"><a class="btn btn-ghost btn-sm" href="catalog.html">Explorar oportunidades</a></div>
+      </div>
+    </div>
+
+    <div class="dashboard-notice">
+      <span class="notice-icon">⚠️</span>
+      <div><strong>Recordatorio de riesgo:</strong> los retornos mostrados son estimaciones del prototipo y no están garantizados. Revisa cada proyecto y sus factores de riesgo antes de tomar una decisión. <button type="button" class="legal-link" onclick="openLegalModal('risk')">Ver aviso de riesgos</button></div>
+    </div>
+
+    ${(pendingReturns && pendingReturns.length) ? `
+    <div class="dashboard-section-title"><div><h2>Retornos esperados</h2><span class="sub">Capital + ganancia que recibirás al vencimiento de cada inversión.</span></div></div>
+    <div class="card" style="padding:16px;margin-bottom:24px;">
+      <table style="width:100%;border-collapse:collapse;font-size:13.5px;">
+        <thead><tr style="text-align:left;border-bottom:1px solid #eee;"><th style="padding:8px 4px;">Proyecto</th><th style="text-align:right;">Monto a recibir</th><th>Fecha estimada</th><th>Faltan</th></tr></thead>
+        <tbody>
+          ${pendingReturns.map(r => `
+            <tr style="border-bottom:1px solid #f3f3f3;">
+              <td style="padding:8px 4px;">${r.projectTitle || '—'}</td>
+              <td style="text-align:right;color:#1a7f37;font-weight:600;">+ ${fmtMoney(r.amount)}</td>
+              <td>${fmtDate(r.scheduledFor)}</td>
+              <td>${r.daysRemaining} días</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>` : ''}
+
+    ${(transactions && transactions.length) ? `
+    <div class="dashboard-section-title"><div><h2>Historial de movimientos</h2><span class="sub">Entradas (retornos recibidos) y salidas (inversiones realizadas).</span></div></div>
+    <div class="card" style="padding:16px;margin-bottom:24px;">
+      <table style="width:100%;border-collapse:collapse;font-size:13.5px;">
+        <thead><tr style="text-align:left;border-bottom:1px solid #eee;"><th style="padding:8px 4px;">Fecha</th><th>Tipo</th><th>Detalle</th><th>Estado</th><th style="text-align:right;">Monto</th></tr></thead>
+        <tbody>
+          ${transactions.slice(0, 20).map(t => `
+            <tr style="border-bottom:1px solid #f3f3f3;">
+              <td style="padding:8px 4px;">${fmtDate(t.completedAt || t.scheduledFor || t.createdAt)}</td>
+              <td>${t.type === 'investment' ? '📤 Inversión' : t.type === 'return' ? '📥 Retorno' : t.type}</td>
+              <td style="color:#666;">${t.description || '—'}</td>
+              <td><span class="status-pill ${t.status}">${t.status}</span></td>
+              <td style="text-align:right;color:${t.direction === 'in' ? '#1a7f37' : '#c0392b'};font-weight:600;">${t.direction === 'in' ? '+' : '-'} ${fmtMoney(t.amount)}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>` : ''}
+
+    <div class="dashboard-section-title"><div><h2>Inteligencia agrícola</h2><span class="sub">Analiza precio, producción, rendimiento y contexto regional antes de revisar tu portafolio.</span></div></div>
+<div class="card" style="padding:20px;margin-bottom:18px;"><div class="crop-tabs" id="investorCropTabs"></div><div id="investorCropAnalytics"></div></div>
+<div id="investorRegionalAnalytics" style="margin-bottom:22px;"></div>
+<div class="card sim-card" style="margin-bottom:24px;">
+      <div class="sim-head">
+        <div><h3 style="margin:0;">🧪 Simulador de portafolio (modo prueba)</h3><p class="sub" style="margin:4px 0 0;">Reparte un presupuesto de prueba entre proyectos y compara riesgo/retorno antes de invertir dinero real.</p></div>
+      </div>
+      <div class="sim-budget-row">
+        <div class="field"><label>Presupuesto de prueba (S/)</label><input type="number" id="simBudget" min="100" step="100" value="${investor.investmentBudget || 10000}"></div>
+        <div class="field">
+          <label>Perfil de riesgo a simular</label>
+          <select id="simProfile">
+            <option value="conservador" ${investor.riskProfile === 'conservador' ? 'selected' : ''}>Conservador</option>
+            <option value="moderado" ${investor.riskProfile === 'moderado' ? 'selected' : ''}>Moderado</option>
+            <option value="agresivo" ${investor.riskProfile === 'agresivo' ? 'selected' : ''}>Agresivo</option>
+          </select>
+        </div>
+        <button class="btn btn-dark btn-sm" onclick="autoAllocate()">✨ Generar distribución sugerida</button>
+        <button class="btn btn-ghost btn-sm" onclick="resetAllocations()">Reiniciar montos</button>
+      </div>
+      <div id="simBody"><div class="loading">Cargando proyectos activos…</div></div>
+    </div>
+
+    <div class="card table-card">
+      <h3>Tokens adquiridos e historial de inversiones</h3>
+      ${investments.length ? `
+      <table>
+        <thead><tr><th>Proyecto</th><th>Cultivo</th><th>Monto</th><th>Tokens</th><th>Retorno esperado</th><th>Estado</th><th>Fecha</th></tr></thead>
+        <tbody>
+          ${investments.map(inv => `
+          <tr>
+            <td><a href="project-detail.html?id=${inv.projectId}" style="font-weight:600;color:var(--agv-dark);">${inv.project?.title || '—'}</a></td>
+            <td>${inv.project?.crop || '—'}</td>
+            <td>${fmtMoney(inv.amount)}</td>
+            <td>${inv.tokensAcquired.toFixed(2)}</td>
+            <td style="color:var(--agv-green);font-weight:600;">${fmtMoney(inv.expectedReturn)}</td>
+            <td><span class="status-pill ${inv.project?.status || 'active'}">${statusLabel(inv.project?.status)}</span></td>
+            <td>${fmtDate(inv.createdAt)}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>` : '<div class="empty-state">Aún no has realizado inversiones. Explora el <a href="catalog.html">catálogo de oportunidades</a>.</div>'}
+    </div>`;
+    if (!investor.verified) {
+      const n = document.createElement('div'); n.className = 'note'; n.style.marginBottom = '18px'; n.id = 'verifyProfileBtn'; n.innerHTML = '<strong>Verificación pendiente:</strong> completa tu verificación antes de realizar aportes. <a href="catalog.html" class="legal-link">Ir al catálogo para comenzar</a>'; content.insertBefore(n, content.querySelector('.dashboard-section-title'));
+    }
+    loadSimulator();
+  } catch (e) {
+    content.innerHTML = '<div class="empty-state">No se pudo cargar el panel. <a href="investor-dashboard.html">Crear nuevo perfil</a></div>';
+  }
+}
+
+// ---------- Portfolio simulator (sandbox only — no real money moves here) ----------
+let simProjects = [];
+const simAllocations = {}; // projectId -> amount
+
+async function loadSimulator() {
+  const body = document.getElementById('simBody');
+  try {
+    simProjects = await API.get('/api/projects?status=active');
+    if (!simProjects.length) {
+      body.innerHTML = '<div class="empty-state">No hay proyectos activos disponibles para simular ahora mismo.</div>';
+      return;
+    }
+    simProjects.forEach(p => { if (!(p.id in simAllocations)) simAllocations[p.id] = 0; });
+    renderSimulator();
+  } catch (e) {
+    body.innerHTML = '<div class="empty-state">No se pudieron cargar los proyectos para el simulador.</div>';
+  }
+}
+
+function remainingNeed(p) { return Math.max(0, p.investmentNeeded - p.amountRaised); }
+
+function renderSimulator() {
+  const body = document.getElementById('simBody');
+  const budget = Number(document.getElementById('simBudget')?.value) || 0;
+
+  const rows = simProjects.map(p => {
+    const cap = remainingNeed(p);
+    const amount = Math.min(simAllocations[p.id] || 0, cap);
+    simAllocations[p.id] = amount;
+    return `
+    <div class="sim-project-row">
+      <div>
+        <div class="title">${p.title}</div>
+        <div class="meta">🌾 ${p.crop} · 📍 ${p.location} · <span class="chip risk-${p.computedRisk}" style="position:static;display:inline-block;padding:2px 8px;">${riskLabel(p.computedRisk)} · ${p.riskScorePct}%${p.riskConsistent ? '' : ' ⚠'}</span></div>
+      </div>
+      <div class="meta">Retorno<br><b style="color:var(--agv-green);font-size:14px;">+${p.expectedReturnPct}%</b></div>
+      <div class="meta">Disponible<br><b>${fmtMoney(cap)}</b></div>
+      <div>
+        <input type="range" min="0" max="${Math.max(cap, 1)}" step="50" value="${amount}" oninput="updateAllocation('${p.id}', this.value, true)">
+      </div>
+      <div>
+        <input type="number" min="0" max="${cap}" step="50" value="${amount}" style="width:100px;" oninput="updateAllocation('${p.id}', this.value, false)">
+      </div>
+    </div>`;
+  }).join('');
+
+  const totalAllocated = Object.values(simAllocations).reduce((s, v) => s + Number(v || 0), 0);
+  const over = totalAllocated > budget;
+  const usedPct = budget > 0 ? Math.min(100, (totalAllocated / budget) * 100) : 0;
+
+  const totalExpected = simProjects.reduce((s, p) => s + (simAllocations[p.id] || 0) * (1 + p.expectedReturnPct / 100), 0);
+  const byRisk = { bajo: 0, medio: 0, alto: 0 };
+  simProjects.forEach(p => { byRisk[p.computedRisk] = (byRisk[p.computedRisk] || 0) + (simAllocations[p.id] || 0); });
+  const cropsUsed = new Set(simProjects.filter(p => (simAllocations[p.id] || 0) > 0).map(p => p.crop)).size;
+
+  body.innerHTML = `
+    <div class="sim-budget-bar"><div class="seg ${over ? 'over' : 'used'}" style="width:${usedPct}%;"></div></div>
+    <div class="sim-summary-row">
+      <div class="box"><div class="l">Asignado / Presupuesto</div><div class="v" style="${over ? 'color:var(--agv-danger);' : ''}">${fmtMoney(totalAllocated)} / ${fmtMoney(budget)}</div></div>
+      <div class="box"><div class="l">Retorno esperado total</div><div class="v" style="color:var(--agv-green);">${fmtMoney(totalExpected)}</div></div>
+      <div class="box"><div class="l">Ganancia proyectada</div><div class="v gold">${fmtMoney(totalExpected - totalAllocated)}</div></div>
+      <div class="box"><div class="l">Cultivos diversificados</div><div class="v">${cropsUsed}</div></div>
+    </div>
+    <div class="sim-risk-breakdown">
+      <span class="pill bajo">Bajo: ${totalAllocated ? Math.round(byRisk.bajo / totalAllocated * 100) : 0}%</span>
+      <span class="pill medio">Medio: ${totalAllocated ? Math.round(byRisk.medio / totalAllocated * 100) : 0}%</span>
+      <span class="pill alto">Alto: ${totalAllocated ? Math.round(byRisk.alto / totalAllocated * 100) : 0}%</span>
+    </div>
+    ${over ? '<p style="color:var(--agv-danger);font-size:13px;font-weight:600;">⚠ La distribución supera tu presupuesto de prueba. Ajusta los montos antes de aplicar.</p>' : ''}
+    <div>${rows}</div>
+    <div class="sim-actions">
+      <button class="btn btn-primary" onclick="applySimulation()" ${over || totalAllocated <= 0 ? 'disabled' : ''}>✅ Convertir esta simulación en inversiones reales</button>
+      <div class="form-msg" id="simMsg"></div>
+    </div>
+    <p class="sim-disclaimer">El simulador no descuenta tu saldo real ni crea inversiones hasta que presiones "Convertir en inversiones reales". El riesgo mostrado es el riesgo contrastado por AgerVest (ver ⚠ si difiere del declarado por el agricultor).</p>
+  `;
+}
+
+function updateAllocation(projectId, value, fromSlider) {
+  const p = simProjects.find(x => x.id === projectId);
+  const cap = p ? remainingNeed(p) : Infinity;
+  let v = Math.max(0, Math.min(Number(value) || 0, cap));
+  simAllocations[projectId] = v;
+  renderSimulator();
+}
+
+function resetAllocations() {
+  simProjects.forEach(p => { simAllocations[p.id] = 0; });
+  renderSimulator();
+}
+
+function autoAllocate() {
+  const budget = Number(document.getElementById('simBudget').value) || 0;
+  const profile = document.getElementById('simProfile').value;
+  const weights = {
+    conservador: { bajo: 3, medio: 1, alto: 0 },
+    moderado: { bajo: 1, medio: 2, alto: 1 },
+    agresivo: { bajo: 0.5, medio: 1, alto: 2 },
+  }[profile];
+
+  resetAllocations();
+  let pool = simProjects
+    .map(p => ({ p, weight: weights[p.computedRisk] || 0, cap: remainingNeed(p) }))
+    .filter(x => x.weight > 0 && x.cap > 0);
+
+  let remaining = budget;
+  for (let pass = 0; pass < 4 && remaining > 1 && pool.length; pass++) {
+    const totalWeight = pool.reduce((s, x) => s + x.weight, 0);
+    if (totalWeight <= 0) break;
+    const stillOpen = [];
+    for (const x of pool) {
+      const share = remaining * (x.weight / totalWeight);
+      const capLeft = x.cap - (simAllocations[x.p.id] || 0);
+      const give = Math.min(share, capLeft);
+      simAllocations[x.p.id] = Math.round(((simAllocations[x.p.id] || 0) + give) / 10) * 10;
+      if (capLeft - give > 1) stillOpen.push(x);
+    }
+    remaining = budget - Object.values(simAllocations).reduce((s, v) => s + Number(v || 0), 0);
+    pool = stillOpen;
+  }
+  renderSimulator();
+}
+
+async function applySimulation() {
+  const msg = document.getElementById('simMsg');
+  const toApply = simProjects.filter(p => (simAllocations[p.id] || 0) > 0);
+  if (!toApply.length) return;
+  if (!confirm(`Se crearán ${toApply.length} inversión(es) reales por un total de ${fmtMoney(toApply.reduce((s, p) => s + simAllocations[p.id], 0))}, descontadas de tu saldo real. ¿Continuar?`)) return;
+  msg.className = 'form-msg';
+  let ok = 0, failed = [];
+  for (const p of toApply) {
+    try {
+      await API.post('/api/investments', { projectId: p.id, amount: simAllocations[p.id] });
+      ok++;
+    } catch (e) { failed.push(p.title + ': ' + e.message); }
+  }
+  if (failed.length) {
+    msg.className = 'form-msg err';
+    msg.textContent = `${ok} inversión(es) aplicadas. Fallaron: ${failed.join(' · ')}`;
+  } else {
+    msg.className = 'form-msg ok';
+    msg.textContent = `¡${ok} inversión(es) reales aplicadas con éxito! Actualizando tu panel…`;
+  }
+  resetAllocations();
+  setTimeout(load, 1200);
+}
+
+document.addEventListener('input', (e) => { if (e.target.id === 'simBudget') renderSimulator(); });
+
+function initInvestorAnalytics(){
+  if(!window.AgerVestAnalytics) return;
+  const tabs=document.getElementById('investorCropTabs');
+  AgerVestAnalytics.cropTabs('Papa','investorCropTabs');
+  const render=(crop)=>AgerVestAnalytics.renderCropPanel('investorCropAnalytics',crop,false,'investor');
+  tabs?.querySelectorAll('[data-av-crop]').forEach(b=>b.addEventListener('click',()=>{tabs.querySelectorAll('.crop-tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');render(b.dataset.avCrop);}));
+  render('Papa');
+  AgerVestAnalytics.renderRiskAndCosts('investorRegionalAnalytics','investor-reg');
+}
+
+load();
+setTimeout(initInvestorAnalytics, 40);
+</script>
+</body>
+</html>

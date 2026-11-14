@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel del agricultor — AgerVest</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<nav class="topbar" id="navbar"></nav>
+
+<section class="section">
+  <div class="container">
+    <div id="content"><div class="loading">Cargando panel…</div></div>
+  </div>
+</section>
+
+<div class="modal-overlay" id="updateModal">
+  <div class="modal">
+    <h3>Reportar avance</h3>
+    <div class="field"><label>Descripción del avance</label><textarea id="updateMsg" placeholder="Ej. Sistema de riego instalado en el 60% del área."></textarea></div>
+    <div class="field"><label>Avance adicional (%)</label><input type="number" id="updateDelta" min="0" max="100" placeholder="15"></div>
+    <div class="form-msg" id="updateFormMsg"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeUpdateModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="submitUpdate()">Publicar reporte</button>
+    </div>
+  </div>
+</div>
+
+<footer id="footer"></footer>
+<script src="js/config.js"></script>
+<script src="js/common.js"></script>
+<script src="js/api-client.js"></script>
+<script src="js/agervest-v3-data.js"></script>
+<script src="js/agervest-analytics.js"></script>
+<script>
+renderNavbar('farmer-dash');
+let currentFarmerId = null;
+let targetProjectForUpdate = null;
+
+async function initFarmerDashboard() {
+  try {
+    const data = await AgerVestAPI.me();
+    if (data.role !== 'farmer') {
+      window.location.href = data.role === 'investor' ? 'investor-dashboard.html' : 'login.html';
+      return;
+    }
+    Session.setFarmer(data.user.id, data.user.name);
+    currentFarmerId = data.user.id;
+    await loadDashboard();
+  } catch (e) {
+    Session.clearLocal();
+    window.location.href = 'login.html';
+  }
+}
+
+async function loadDashboard() {
+  const content = document.getElementById('content');
+  content.innerHTML = '<div class="loading">Cargando panel…</div>';
+  try {
+    const { farmer, projects, totalRaised, activeProjects, walletBalance, pendingObligations, transactions } = await AgerVestAPI.getFarmerDashboard(currentFarmerId);
+    content.innerHTML = `
+    <div class="dash-header">
+      <div class="who">
+        <div class="avatar">${initials(farmer.name)}</div>
+        <div><h1>${farmer.name}</h1><div class="sub">${farmer.location} · ${farmer.cropType} · ${farmer.areaHa} ha ${farmer.validated ? '· <span style="color:var(--agv-green);font-weight:700;">✅ Validado</span>' : '· ⏳ Pendiente de validación'}</div></div>
+      </div>
+      <a href="register-project.html" class="btn btn-primary">+ Publicar nuevo proyecto</a>
+    </div>
+
+    <div class="kpi-row">
+      <div class="card kpi-card"><div class="l">💰 Saldo billetera</div><div class="v gold">${fmtMoney(walletBalance)}</div></div>
+      <div class="card kpi-card"><div class="l">Financiamiento recibido (histórico)</div><div class="v">${fmtMoney(totalRaised)}</div></div>
+      <div class="card kpi-card"><div class="l">Retornos por pagar</div><div class="v">${fmtMoney((pendingObligations || []).reduce((s,o) => s + Number(o.amount), 0))}</div></div>
+      <div class="card kpi-card"><div class="l">Proyectos activos</div><div class="v">${activeProjects}</div></div>
+    </div>
+
+    ${(pendingObligations && pendingObligations.length) ? `
+    <div class="dashboard-section-title"><div><h2>Retornos pendientes de pago</h2><span class="sub">Fechas en que debes devolver capital + ganancia a tus inversionistas.</span></div></div>
+    <div class="card" style="padding:16px;margin-bottom:20px;">
+      <table style="width:100%;border-collapse:collapse;font-size:13.5px;">
+        <thead><tr style="text-align:left;border-bottom:1px solid #eee;"><th style="padding:8px 4px;">Proyecto</th><th>Inversionista</th><th>Monto</th><th>Vence</th><th>Días</th></tr></thead>
+        <tbody>
+          ${pendingObligations.map(o => `
+            <tr style="border-bottom:1px solid #f3f3f3;">
+              <td style="padding:8px 4px;">${o.projectTitle || '—'}</td>
+              <td>${o.investorName || '—'}</td>
+              <td><b>${fmtMoney(o.amount)}</b></td>
+              <td>${fmtDate(o.scheduledFor)}</td>
+              <td style="color:${o.daysUntilDue < 0 ? '#c0392b' : 'inherit'};">${o.daysUntilDue < 0 ? 'Vencido' : o.daysUntilDue + ' d'}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>` : ''}
+
+    ${(transactions && transactions.length) ? `
+    <div class="dashboard-section-title"><div><h2>Movimientos de billetera</h2><span class="sub">Entradas y salidas reales de tu billetera.</span></div></div>
+    <div class="card" style="padding:16px;margin-bottom:20px;">
+      <table style="width:100%;border-collapse:collapse;font-size:13.5px;">
+        <thead><tr style="text-align:left;border-bottom:1px solid #eee;"><th style="padding:8px 4px;">Fecha</th><th>Tipo</th><th>Detalle</th><th>Estado</th><th style="text-align:right;">Monto</th></tr></thead>
+        <tbody>
+          ${transactions.slice(0, 20).map(t => `
+            <tr style="border-bottom:1px solid #f3f3f3;">
+              <td style="padding:8px 4px;">${fmtDate(t.completedAt || t.scheduledFor || t.createdAt)}</td>
+              <td>${t.type === 'investment' ? '📥 Inversión recibida' : t.type === 'return' ? '📤 Retorno' : t.type}</td>
+              <td style="color:#666;">${t.description || '—'}</td>
+              <td><span class="status-pill ${t.status}">${t.status}</span></td>
+              <td style="text-align:right;color:${t.direction === 'in' ? '#1a7f37' : '#c0392b'};font-weight:600;">${t.direction === 'in' ? '+' : '-'} ${fmtMoney(t.amount)}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>` : ''}
+
+    <div class="dashboard-insights">
+      <div class="insight-card highlight">
+        <div class="insight-head"><h3 class="insight-title">Estado del perfil</h3><span class="insight-icon">🛡️</span></div>
+        <div class="insight-value">${farmer.validated ? 'Perfil validado' : 'Pendiente de validación'}</div>
+        <p class="insight-copy">${farmer.validated ? 'Tu identidad y perfil cuentan con validación en la plataforma.' : 'Completa y mantén actualizada tu documentación para fortalecer la confianza de tu perfil.'}</p>
+        <div class="quick-actions"><span class="status-summary ${farmer.validated ? '' : 'pending'}">${farmer.validated ? '● Verificado' : '● En revisión'}</span></div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-head"><h3 class="insight-title">Financiamiento de proyectos</h3><span class="insight-icon">🌱</span></div>
+        <div class="insight-value">${projects.length ? Math.round(projects.reduce((s,p) => s + Math.min(100, (p.amountRaised / p.investmentNeeded) * 100), 0) / projects.length) : 0}%</div>
+        <p class="insight-copy">Promedio de avance de financiamiento de tus proyectos publicados.</p>
+        <div class="dashboard-progress-label"><span>Avance promedio</span><b>${projects.length ? Math.round(projects.reduce((s,p) => s + Math.min(100, (p.amountRaised / p.investmentNeeded) * 100), 0) / projects.length) : 0}%</b></div>
+        <div class="progress-bar"><div class="fill" style="width:${projects.length ? Math.round(projects.reduce((s,p) => s + Math.min(100, (p.amountRaised / p.investmentNeeded) * 100), 0) / projects.length) : 0}%"></div></div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-head"><h3 class="insight-title">Próximo paso</h3><span class="insight-icon">🚀</span></div>
+        <div class="insight-value">${projects.length ? 'Mantén actualizado' : 'Publica tu proyecto'}</div>
+        <p class="insight-copy">${projects.length ? 'Comparte avances para mantener informados a los potenciales inversionistas.' : 'Presenta tu primer proyecto agrícola para comenzar a recibir interés.'}</p>
+        <div class="quick-actions">
+          ${projects.length ? '<button class="btn btn-ghost btn-sm" onclick="document.getElementById(\'projList\')?.scrollIntoView({behavior:\'smooth\'})">Ver mis proyectos</button>' : '<a class="btn btn-primary btn-sm" href="register-project.html">+ Publicar proyecto</a>'}
+        </div>
+      </div>
+    </div>
+
+    <div class="dashboard-insights v3-score-guide">
+      <div class="insight-card"><div class="insight-head"><h3 class="insight-title">Qué mejora tu score</h3><span class="insight-icon">📈</span></div><ul class="insight-list"><li>Mantener documentos e información actualizados.</li><li>Cumplir hitos y adjuntar evidencias de avance.</li><li>Registrar resultados de campañas anteriores.</li><li>Contar con validación de parcela y acompañamiento técnico.</li></ul></div>
+      <div class="insight-card"><div class="insight-head"><h3 class="insight-title">Lectura del riesgo</h3><span class="insight-icon">⚠️</span></div><p class="insight-copy">El riesgo del proyecto combina factores productivos, mercado, clima, siniestralidad y costos. Un proyecto con buena gestión aún puede enfrentar riesgos externos.</p></div>
+      <div class="insight-card"><div class="insight-head"><h3 class="insight-title">Datos de referencia</h3><span class="insight-icon">📚</span></div><p class="insight-copy">La analítica agrícola de AgerVest incorpora series de referencia de MIDAGRI, SENAMHI y SAC para contextualizar tus campañas.</p></div>
+    </div>
+
+    <div class="dashboard-notice">
+      <span class="notice-icon">ℹ️</span>
+      <div><strong>Buenas prácticas:</strong> mantén actualizados los avances, montos y documentos de tus proyectos. La información publicada debe ser veraz y verificable; el estado de validación no representa una garantía de financiamiento.</div>
+    </div>
+
+    <div class="dashboard-section-title"><div><h2>Referencias de mercado y cultivo</h2><span class="sub">Consulta series observadas del cultivo principal de tu perfil y compáralas con Arequipa.</span></div></div>
+<div class="card" style="padding:20px;margin-bottom:24px;"><div id="farmerAnalytics"></div></div>
+<div class="dashboard-section-title">
+      <div><h2>Mis proyectos</h2><span class="sub">Gestiona publicaciones, financiamiento y avances agrícolas.</span></div>
+      <a href="register-project.html" class="btn btn-ghost btn-sm">+ Nuevo proyecto</a>
+    </div>
+    <div class="grid grid-3" id="projList" style="margin-bottom:20px;"></div>
+    `;
+    if (window.AgerVestAnalytics) AgerVestAnalytics.renderCropPanel('farmerAnalytics', farmer.cropType, true, 'farmer');
+    const list = document.getElementById('projList');
+    if (!projects.length) {
+      list.innerHTML = '<div class="empty-state">Aún no has publicado proyectos.</div>';
+    } else {
+      list.innerHTML = projects.map(p => {
+        const pct = Math.min(100, Math.round((p.amountRaised / p.investmentNeeded) * 100));
+        return `
+        <div class="card" style="padding:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:start;gap:8px;">
+            <h3 style="margin:0;font-size:15.5px;">${p.title}</h3>
+            <span class="status-pill ${p.status}">${statusLabel(p.status)}</span>
+          </div>
+          <div class="meta" style="margin:6px 0;font-size:12.5px;color:var(--agv-muted);">🌾 ${p.crop} · ⏱ ${p.durationMonths} meses</div>
+          <div class="progress-bar"><div class="fill" style="width:${pct}%"></div></div>
+          <div class="stats-row" style="margin:6px 0 10px;"><span><b>${fmtMoney(p.amountRaised)}</b> / ${fmtMoney(p.investmentNeeded)}</span><span>Avance cultivo: ${p.progress}%</span></div>
+          <div style="display:flex;gap:8px;">
+            <a href="project-detail.html?id=${p.id}" class="btn btn-ghost btn-sm" style="flex:1;">Ver detalle</a>
+            <button class="btn btn-dark btn-sm" style="flex:1;" onclick="openUpdateModal('${p.id}')">Reportar avance</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+  } catch (e) {
+    content.innerHTML = '<div class="empty-state">No se pudo cargar el panel.</div>';
+  }
+}
+
+function openUpdateModal(projectId) {
+  targetProjectForUpdate = projectId;
+  document.getElementById('updateMsg').value = '';
+  document.getElementById('updateDelta').value = '';
+  document.getElementById('updateFormMsg').className = 'form-msg';
+  document.getElementById('updateModal').classList.add('open');
+}
+function closeUpdateModal() { document.getElementById('updateModal').classList.remove('open'); }
+
+async function submitUpdate() {
+  const message = document.getElementById('updateMsg').value.trim();
+  const progressDelta = Number(document.getElementById('updateDelta').value) || 0;
+  const msg = document.getElementById('updateFormMsg');
+  if (!message) { msg.className = 'form-msg err'; msg.textContent = 'Describe el avance.'; return; }
+  try {
+    await AgerVestAPI.addProjectUpdate(targetProjectForUpdate, { message, progressDelta });
+    msg.className = 'form-msg ok';
+    msg.textContent = 'Reporte publicado.';
+    setTimeout(() => { closeUpdateModal(); loadDashboard(); }, 700);
+  } catch (e) {
+    msg.className = 'form-msg err';
+    msg.textContent = 'Error: ' + e.message;
+  }
+}
+
+initFarmerDashboard();
+</script>
+</body>
+</html>

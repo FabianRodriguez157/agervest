@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Detalle del proyecto — AgerVest</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<nav class="topbar" id="navbar"></nav>
+
+<section class="section">
+  <div class="container" id="content"><div class="loading">Cargando proyecto…</div></div>
+</section>
+
+<div class="modal-overlay" id="investModal">
+  <div class="modal">
+    <h3>Invertir en este proyecto</h3>
+    <div class="note" id="investorIdentityNote">Tu sesión determinará automáticamente la cuenta inversionista que realizará la operación.</div>
+    <div class="field">
+      <label>Monto a invertir (S/)</label>
+      <input type="number" id="investAmount" min="50" placeholder="1000">
+    </div>
+    <div class="form-msg" id="investMsg"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="submitInvestment()">Confirmar inversión</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="verifyModal">
+  <div class="modal">
+    <h3>🧾 Verificación del inversionista</h3>
+    <p>Completa estos datos para simular el envío de tu solicitud de validación antes de una operación.</p>
+    <div class="field"><label>DNI / documento</label><input id="verifyDoc" maxlength="12" placeholder="Documento"></div>
+    <div class="field"><label>Celular</label><input id="verifyPhone" placeholder="999 999 999"></div>
+    <div class="field"><label>Cuenta bancaria o CCI</label><input id="verifyBank" placeholder="Dato para el prototipo"></div>
+    <div class="note">En esta versión académica el proceso es demostrativo. No se realiza una validación oficial con terceros.</div>
+    <div class="form-msg" id="verifyMsg"></div>
+    <div class="modal-actions"><button class="btn btn-ghost" onclick="closeVerification()">Cancelar</button><button class="btn btn-primary" onclick="submitVerification()">Enviar a validación</button></div>
+  </div>
+</div>
+
+<footer id="footer"></footer>
+<script src="js/config.js"></script>
+<script src="js/common.js"></script>
+<script src="js/api-client.js"></script>
+<script src="js/agervest-v3-data.js"></script>
+<script src="js/agervest-analytics.js"></script>
+<script>
+renderNavbar('catalog');
+const projectId = new URLSearchParams(location.search).get('id');
+
+async function load() {
+  const content = document.getElementById('content');
+  if (!projectId) { content.innerHTML = '<div class="empty-state">Proyecto no especificado.</div>'; return; }
+  try {
+    const { project: p, farmer, token, updates, investorsCount, riskAssessment: ra } = await AgerVestAPI.getProject(projectId);
+    const pct = Math.min(100, Math.round((p.amountRaised / p.investmentNeeded) * 100));
+    content.innerHTML = `
+    <div class="detail-grid">
+      <div>
+        <img class="detail-hero-img" src="${p.imageUrl}" alt="${p.title}">
+        <div class="tag-row">
+          <span class="tag">🌾 ${p.crop}</span>
+          <span class="tag">📍 ${p.location}</span>
+          <span class="tag">⏱ ${p.durationMonths} meses</span>
+          <span class="chip risk-${p.risk}" style="position:static;display:inline-block;">${riskLabel(p.risk)}</span>
+        </div>
+        <h1 style="font-size:26px;color:var(--agv-dark);margin:0 0 14px;">${p.title}</h1>
+
+        <div class="farmer-mini">
+          <div class="avatar">${initials(farmer?.name)}</div>
+          <div>
+            <div style="font-weight:700;">${farmer?.name || 'Agricultor'}</div>
+            <div class="verified">${farmer?.validated ? '✅ Agricultor validado · confianza ' + farmer.trustScore + '/100' : '⏳ Validación pendiente'}</div>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--agv-muted);margin:-10px 0 20px;">
+          Verificación contrastable en <a href="https://sidea.midagri.gob.pe/" target="_blank" rel="noopener" style="color:var(--agv-green);font-weight:700;">SIDEA — MIDAGRI</a> (referencial, simulado en este prototipo).
+        </p>
+
+        <div class="project-v3-score-strip"><div><span>👨‍🌾 Productor</span><strong>${farmer?.trustScore ?? 0}/100</strong><small>Solidez operativa observada</small></div><div><span>📉 Riesgo calculado</span><strong>${ra.riskScorePct}%</strong><small>Menor exposición estimada</small></div><div><span>🛡️ Confianza</span><strong>${Math.round(((farmer?.trustScore ?? 0)+(100-ra.riskScorePct)+(farmer?.validated?100:60))/3)}/100</strong><small>Índice referencial</small></div></div>
+
+        <div class="info-block"><h4>Descripción del proyecto</h4><p>${p.description}</p></div>
+        <div class="info-block"><h4>Objetivos</h4><p>${p.objectives}</p></div>
+        <div class="info-block"><h4>Beneficios esperados</h4><p>${p.benefits}</p></div>
+
+        <div class="info-block risk-contrast-block ${ra.consistent ? '' : 'inconsistent'}">
+          <h4>🔍 Riesgo contrastado por AgerVest</h4>
+          <div class="risk-contrast-row">
+            <div class="risk-contrast-pill"><span class="l">Riesgo declarado</span><span class="chip risk-${ra.declaredRisk}" style="position:static;display:inline-block;">${riskLabel(ra.declaredRisk)}</span></div>
+            <div class="risk-contrast-pill"><span class="l">Riesgo calculado</span><span class="chip risk-${ra.computedRisk}" style="position:static;display:inline-block;">${riskLabel(ra.computedRisk)} · ${ra.riskScorePct}%</span></div>
+          </div>
+          <p class="risk-contrast-note ${ra.consistent ? 'ok' : 'warn'}">${ra.consistent ? '✅' : '⚠️'} ${ra.note}</p>
+
+          <div class="risk-score-bar">
+            <div class="risk-score-fill" style="left:calc(${ra.riskScorePct}% - 1px);"></div>
+            <div class="risk-score-band b1"></div><div class="risk-score-band b2"></div>
+          </div>
+          <div class="risk-score-labels"><span>0% bajo</span><span>33%</span><span>66%</span><span>100% alto</span></div>
+
+          <table class="risk-calc-table">
+            <thead><tr><th>Factor</th><th>Peso</th><th>Nivel asignado</th><th>Aporte</th></tr></thead>
+            <tbody>
+              ${ra.factors.map(f => `
+              <tr>
+                <td>
+                  <div style="font-weight:600;">${f.label}</div>
+                  <div style="font-size:11.5px;color:var(--agv-muted);">${f.explanation}</div>
+                </td>
+                <td>${f.weightPct}%</td>
+                <td>${f.valueScore}/100</td>
+                <td style="font-weight:700;color:var(--agv-dark);">${f.weightPct}% × ${f.valueScore} = ${f.contribution.toFixed(1)}</td>
+              </tr>`).join('')}
+              <tr class="risk-calc-total">
+                <td colspan="3" style="text-align:right;font-weight:700;">Puntaje total de riesgo</td>
+                <td style="font-weight:800;font-size:15px;color:var(--agv-dark);">${ra.riskScorePct}%</td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="font-size:11px;color:var(--agv-muted);margin-top:8px;">El puntaje suma el aporte de 7 factores, cada uno con un peso fijo (los pesos suman 100%). Cálculo generado automáticamente a partir de los datos declarados del proyecto y del agricultor; no reemplaza una evaluación financiera profesional.</p>
+        </div>
+
+        <div class="info-block season-block">
+          <h4>🌦️ Temporada y clima del cultivo</h4>
+          <div class="season-grid">
+            <div><span class="l">Ciclo del cultivo</span><span class="v">${si.ciclo}</span></div>
+            <div><span class="l">Siembra habitual</span><span class="v">${si.siembra}</span></div>
+            <div><span class="l">Cosecha habitual</span><span class="v">${si.cosecha}</span></div>
+            <div><span class="l">Clima ideal</span><span class="v">${si.climaIdeal}</span></div>
+          </div>
+          <div class="season-risks">
+            <div>
+              <h5>Riesgos climáticos del cultivo</h5>
+              <ul>${si.riesgosClimaticos.map(r => `<li>${r}</li>`).join('')}</ul>
+            </div>
+            <div>
+              <h5>Clima de la zona (${p.location})</h5>
+              <p style="font-size:13px;margin:0 0 6px;">${si.regionClima}</p>
+              <ul>${si.regionRiesgos.map(r => `<li>${r}</li>`).join('')}</ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-block av-detail-analytics">
+          <div class="section-head left" style="margin-bottom:14px;"><div><span class="eyebrow">Analítica agrícola V3</span><h2>Contexto histórico del cultivo</h2><p class="sub">Datos de referencia para contextualizar mercado y producción; no constituyen pronósticos.</p></div></div>
+          <div class="crop-tabs" id="detailCropTabs"></div>
+          <div id="detailAnalytics"></div>
+        </div>
+
+        <div class="info-block">
+          <h4>Mitigación de riesgo declarada por el agricultor</h4><p>${p.riskMitigation || 'No especificada.'}</p>
+        </div>
+
+        <div class="info-block">
+          <h4>Trazabilidad y avance del proyecto</h4>
+          <div class="timeline">
+            ${(updates || []).length ? updates.map(u => `
+              <div class="timeline-item"><div class="date">${fmtDate(u.createdAt)}</div><p>${u.message} ${u.progressDelta ? `(+${u.progressDelta}% avance)` : ''}</p></div>
+            `).join('') : '<p style="color:var(--agv-muted);font-size:13.5px;">Aún no hay reportes de avance.</p>'}
+          </div>
+        </div>
+      </div>
+
+      <div class="card invest-panel">
+        <div class="raised">${fmtMoney(p.amountRaised)} <span style="font-size:14px;color:var(--agv-muted);font-weight:400;">recaudado</span></div>
+        <div class="need">Meta: ${fmtMoney(p.investmentNeeded)}</div>
+        <div class="progress-bar" style="margin-top:12px;"><div class="fill" style="width:${pct}%"></div></div>
+        <div class="stats-row" style="margin-top:6px;"><span>${pct}% completado</span><span>${investorsCount} inversionista(s)</span></div>
+
+        <div class="stats-grid">
+          <div class="stat-box"><div class="v return-tag">+${p.expectedReturnPct}%</div><div class="l">Retorno esperado</div></div>
+          <div class="stat-box"><div class="v">${statusLabel(p.status)}</div><div class="l">Estado</div></div>
+          <div class="stat-box"><div class="v">${p.progress}%</div><div class="l">Avance del cultivo</div></div>
+          <div class="stat-box"><div class="v">${token ? fmtMoney(token.price) : '-'}</div><div class="l">Precio por token (${token?.symbol || ''})</div></div>
+        </div>
+
+        <button class="btn btn-primary btn-block" onclick="openModal()" ${p.status !== 'active' ? 'disabled' : ''}>
+          ${p.status === 'active' ? '💰 Invertir en este proyecto' : 'Financiamiento cerrado'}
+        </button>
+      </div>
+    </div>`;
+    initHistoricalAnalytics(p.crop);
+  } catch (e) {
+    content.innerHTML = '<div class="empty-state">No se pudo cargar el proyecto.</div>';
+  }
+}
+
+async function openModal() {
+  try {
+    const me = await AgerVestAPI.me();
+    if (me.role !== 'investor') { window.location.href = me.role === 'farmer' ? 'farmer-dashboard.html' : me.role === 'ally' ? 'ally-dashboard.html' : 'login.html'; return; }
+    Session.setInvestor(me.user.id, me.user.name);
+    const note = document.getElementById('investorIdentityNote');
+    const inv = me.user;
+    if (note) note.innerHTML = `<strong>Cuenta:</strong> ${inv.name} · ${inv.email} · <strong>Disponible:</strong> ${fmtMoney(inv.walletBalance)}${inv.verified ? ' · ✅ Verificación completada' : ' · ⏳ Verificación requerida'}`;
+    document.getElementById('investModal').classList.add('open');
+  } catch (e) { window.location.href = 'login.html'; }
+}
+function closeModal() { document.getElementById('investModal').classList.remove('open'); document.getElementById('investMsg').className = 'form-msg'; }
+async function submitInvestment() {
+  const msg = document.getElementById('investMsg'); const amount = Number(document.getElementById('investAmount').value);
+  if (!amount || amount <= 0) { msg.className = 'form-msg err'; msg.textContent = 'Ingresa un monto válido.'; return; }
+  try {
+    const me = await AgerVestAPI.me(); if (me.role !== 'investor') throw new Error('Debes iniciar sesión como inversionista.');
+    if (!me.user.verified) {
+      msg.className = 'form-msg err'; msg.innerHTML = `Antes de invertir debes completar la verificación del perfil. <button type="button" class="legal-link" onclick="openVerification()">Completar verificación</button>`; return;
+    }
+    await AgerVestAPI.invest(projectId, amount); msg.className = 'form-msg ok'; msg.textContent = '¡Inversión realizada! El dinero se transfirió a la billetera del agricultor y tu retorno quedó programado.'; setTimeout(() => { closeModal(); load(); }, 1200);
+  } catch (e) { msg.className = 'form-msg err'; msg.textContent = 'Error: ' + e.message; }
+}
+function openVerification(){ document.getElementById('verifyModal').classList.add('open'); }
+function closeVerification(){ document.getElementById('verifyModal').classList.remove('open'); const msg=document.getElementById('verifyMsg'); if(msg){msg.className='form-msg';msg.textContent='';} }
+async function submitVerification(){const msg=document.getElementById('verifyMsg');try{const u=await AgerVestAPI.verifyInvestor({documentId:document.getElementById('verifyDoc').value.trim(),phone:document.getElementById('verifyPhone').value.trim(),bankAccount:document.getElementById('verifyBank').value.trim()});Session.setInvestor(u.user.id,u.user.name);msg.className='form-msg ok';msg.textContent='Solicitud de verificación registrada. En este prototipo se habilitó el flujo de operación.';setTimeout(()=>{closeVerification();location.reload()},900)}catch(e){msg.className='form-msg err';msg.textContent='Error: '+e.message}}
+
+function initHistoricalAnalytics(crop){
+  if (!window.AgerVestAnalytics) return; const tabs=document.getElementById('detailCropTabs'); AgerVestAnalytics.cropTabs(crop,'detailCropTabs');
+  const render=(c)=>AgerVestAnalytics.renderCropPanel('detailAnalytics',c,false,'detail');
+  tabs.querySelectorAll('[data-av-crop]').forEach(b=>b.addEventListener('click',()=>{tabs.querySelectorAll('.crop-tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');render(b.dataset.avCrop);})); render(crop);
+}
+
+load();
+// Historical analytics are rendered after the project detail is available.
+</script>
+</body>
+</html>

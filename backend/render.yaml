@@ -1,0 +1,44 @@
+# Despliegue del backend AgerVest en Render.com
+# Uso:
+#   1. Haz push de este repo a GitHub.
+#   2. En render.com → New → Blueprint → selecciona el repo.
+#   3. Render lee este archivo y crea: PostgreSQL + Web Service.
+#   4. Edita CORS_ORIGINS con el dominio de GitHub Pages:
+#        https://<usuario>.github.io
+#   5. Después del primer deploy, en el shell del servicio ejecuta:
+#        npm run db:migrate && npm run db:seed
+
+databases:
+  - name: agervest-db
+    plan: free
+    databaseName: agervest
+    user: agervest
+    postgresMajorVersion: 16
+
+services:
+  - type: web
+    name: agervest-api
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    startCommand: node dist/server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: agervest-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: COOKIE_NAME
+        value: agv_session
+      - key: COOKIE_SAMESITE
+        value: none
+      - key: BCRYPT_ROUNDS
+        value: 10
+      - key: CORS_ORIGINS
+        value: https://CAMBIAME.github.io

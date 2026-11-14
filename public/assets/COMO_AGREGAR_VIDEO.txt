@@ -1,0 +1,9 @@
+VIDEO DE PORTADA
+
+1. Descarga un video MP4 horizontal de 10-20 segundos.
+2. Recomendación visual: toma aérea de cultivos, riego tecnificado, manos trabajando o campo al amanecer.
+3. Renómbralo como: hero-background.mp4
+4. Colócalo en esta carpeta assets/.
+5. En index.html busca "VIDEO DE FONDO DEL HERO" y descomenta la línea <source src="assets/hero-background.mp4" type="video/mp4">.
+
+El CSS ya incluye un overlay claro para que el texto siga siendo legible.

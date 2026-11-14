@@ -1,0 +1,292 @@
+{
+  "projects": [
+    {
+      "id": "papa",
+      "crop": "Papa",
+      "title": "Papa nativa",
+      "place": "Caylloma",
+      "region": "Arequipa",
+      "goal": 68000,
+      "funded": 72,
+      "minContribution": 100,
+      "term": "8 meses",
+      "stage": "Desarrollo",
+      "emoji": "🥔",
+      "summary": "Campaña de papa nativa con enfoque comercial regional y seguimiento por hitos productivos.",
+      "purpose": "Capital de trabajo para preparación de suelo, insumos, labores y cosecha.",
+      "photoTone": "Sierra alta",
+      "producer": {
+        "name": "R. Quispe",
+        "location": "Caylloma, Arequipa",
+        "years": 12,
+        "association": "Asociación Agraria Valle Alto",
+        "flags": [
+          "PPA verificado",
+          "Parcela verificada",
+          "Asociado local",
+          "Validación agronómica"
+        ],
+        "history": "5 campañas documentadas en papa y granos andinos.",
+        "completion": "2 campañas acompañadas con evidencia completa.",
+        "score": 84,
+        "verification": 92
+      },
+      "projectRiskScore": 49,
+      "riskLabel": "Moderado",
+      "producerScore": 84,
+      "confidenceIndex": 74,
+      "verificationCompleteness": 92,
+      "metrics": {
+        "harvest2025": 5449.0,
+        "harvest2026": 3487.0,
+        "production2025": 197310.87,
+        "production2026": 137857.02,
+        "yield2025": 36210.47,
+        "yield2026": 39534.56,
+        "price2025": 0.777,
+        "price2026": 1.103,
+        "harvestVar": -36.01,
+        "productionVar": -30.13,
+        "yieldVar": 9.18,
+        "priceVar": 41.89
+      },
+      "riskFactors": [
+        {
+          "label": "Desempeño productivo",
+          "value": 51
+        },
+        {
+          "label": "Mercado y precio",
+          "value": 55
+        },
+        {
+          "label": "Clima regional",
+          "value": 50
+        },
+        {
+          "label": "Siniestralidad SAC",
+          "value": 62
+        },
+        {
+          "label": "Presión de costos",
+          "value": 47
+        }
+      ],
+      "milestones": [
+        "Preparación y validación de parcela",
+        "Siembra / instalación",
+        "Seguimiento del desarrollo",
+        "Cosecha y cierre comercial"
+      ],
+      "insights": [
+        "Rendimiento sube 9.2% entre 2025 y 2026.",
+        "Precio en chacra sube 41.9% frente a julio de 2025.",
+        "El proyecto se acompaña con validación documental y seguimiento por hitos."
+      ],
+      "stageDescription": "El cultivo se encuentra en crecimiento y se realiza seguimiento de labores e hitos.",
+      "scoreHelp": {
+        "producer": "0 = menor evidencia y experiencia verificada. 100 = mayor solidez operativa según la información revisada.",
+        "risk": "0 = menor exposición estimada a factores de riesgo. 100 = mayor exposición estimada.",
+        "confidence": "0 = menor nivel de confianza integral. 100 = mayor nivel de confianza considerando productor, riesgo y verificación."
+      }
+    },
+    {
+      "id": "quinua",
+      "crop": "Quinua",
+      "title": "Quinua comercial",
+      "place": "Castilla",
+      "region": "Arequipa",
+      "goal": 54000,
+      "funded": 61,
+      "minContribution": 80,
+      "term": "7 meses",
+      "stage": "Siembra",
+      "emoji": "🌾",
+      "summary": "Proyecto de quinua con buen comportamiento productivo reciente y acompañamiento asociativo.",
+      "purpose": "Financiar siembra, manejo técnico y control fitosanitario con seguimiento simplificado.",
+      "photoTone": "Zona interandina",
+      "producer": {
+        "name": "M. Huamani",
+        "location": "Castilla, Arequipa",
+        "years": 9,
+        "association": "Cooperativa Sur Andina",
+        "flags": [
+          "PPA verificado",
+          "Asistencia técnica",
+          "Parcela verificada",
+          "Buenas prácticas"
+        ],
+        "history": "4 campañas documentadas en quinua con comercialización asociativa.",
+        "completion": "1 campaña con cumplimiento total de hitos.",
+        "score": 78,
+        "verification": 90
+      },
+      "projectRiskScore": 30,
+      "riskLabel": "Bajo",
+      "producerScore": 78,
+      "confidenceIndex": 78,
+      "verificationCompleteness": 90,
+      "metrics": {
+        "harvest2025": 482.0,
+        "harvest2026": 897.0,
+        "production2025": 1544.43,
+        "production2026": 3340.42,
+        "yield2025": 3204.21,
+        "yield2026": 3723.99,
+        "price2025": 6.202,
+        "price2026": 6.0,
+        "harvestVar": 86.1,
+        "productionVar": 116.29,
+        "yieldVar": 16.22,
+        "priceVar": -3.25
+      },
+      "riskFactors": [
+        {
+          "label": "Desempeño productivo",
+          "value": 17
+        },
+        {
+          "label": "Mercado y precio",
+          "value": 51
+        },
+        {
+          "label": "Clima regional",
+          "value": 48
+        },
+        {
+          "label": "Siniestralidad SAC",
+          "value": 62
+        },
+        {
+          "label": "Presión de costos",
+          "value": 46
+        }
+      ],
+      "milestones": [
+        "Preparación y validación de parcela",
+        "Siembra / instalación",
+        "Seguimiento del desarrollo",
+        "Cosecha y cierre comercial"
+      ],
+      "insights": [
+        "Rendimiento sube 16.2% entre 2025 y 2026.",
+        "Precio en chacra baja 3.2% frente a julio de 2025.",
+        "El proyecto se acompaña con validación documental y seguimiento por hitos."
+      ],
+      "stageDescription": "La campaña ya inició la instalación o siembra y se verifican sus primeras evidencias.",
+      "scoreHelp": {
+        "producer": "0 = menor evidencia y experiencia verificada. 100 = mayor solidez operativa según la información revisada.",
+        "risk": "0 = menor exposición estimada a factores de riesgo. 100 = mayor exposición estimada.",
+        "confidence": "0 = menor nivel de confianza integral. 100 = mayor nivel de confianza considerando productor, riesgo y verificación."
+      }
+    },
+    {
+      "id": "cebolla",
+      "crop": "Cebolla",
+      "title": "Cebolla roja",
+      "place": "Camaná",
+      "region": "Arequipa",
+      "goal": 49000,
+      "funded": 39,
+      "minContribution": 70,
+      "term": "6 meses",
+      "stage": "Preparación",
+      "emoji": "🧅",
+      "summary": "Campaña de cebolla con ticket accesible y foco en trazabilidad de costos y avance.",
+      "purpose": "Cubrir labores iniciales, alquiler de maquinaria y manejo de la campaña.",
+      "photoTone": "Valle costero",
+      "producer": {
+        "name": "J. Ccallo",
+        "location": "Camaná, Arequipa",
+        "years": 11,
+        "association": "Red Hortícola Costera",
+        "flags": [
+          "PPA verificado",
+          "Parcela verificada",
+          "Historial productivo",
+          "Acopio identificado"
+        ],
+        "history": "6 campañas documentadas en cebolla y hortalizas de rotación.",
+        "completion": "1 campaña previa con trazabilidad operativa validada.",
+        "score": 80,
+        "verification": 91
+      },
+      "projectRiskScore": 61,
+      "riskLabel": "Moderado",
+      "producerScore": 80,
+      "confidenceIndex": 68,
+      "verificationCompleteness": 91,
+      "metrics": {
+        "harvest2025": 6109.0,
+        "harvest2026": 4777.0,
+        "production2025": 247561.5,
+        "production2026": 189684.97,
+        "yield2025": 40524.06,
+        "yield2026": 39707.97,
+        "price2025": 0.404,
+        "price2026": 0.716,
+        "harvestVar": -21.8,
+        "productionVar": -23.38,
+        "yieldVar": -2.01,
+        "priceVar": 77.4
+      },
+      "riskFactors": [
+        {
+          "label": "Desempeño productivo",
+          "value": 56
+        },
+        {
+          "label": "Mercado y precio",
+          "value": 60
+        },
+        {
+          "label": "Clima regional",
+          "value": 49
+        },
+        {
+          "label": "Siniestralidad SAC",
+          "value": 62
+        },
+        {
+          "label": "Presión de costos",
+          "value": 49
+        }
+      ],
+      "milestones": [
+        "Preparación y validación de parcela",
+        "Siembra / instalación",
+        "Seguimiento del desarrollo",
+        "Cosecha y cierre comercial"
+      ],
+      "insights": [
+        "Rendimiento baja 2.0% entre 2025 y 2026.",
+        "Precio en chacra sube 77.4% frente a julio de 2025.",
+        "El proyecto se acompaña con validación documental y seguimiento por hitos."
+      ],
+      "stageDescription": "El proyecto está organizando presupuesto, parcela y labores previas al inicio.",
+      "scoreHelp": {
+        "producer": "0 = menor evidencia y experiencia verificada. 100 = mayor solidez operativa según la información revisada.",
+        "risk": "0 = menor exposición estimada a factores de riesgo. 100 = mayor exposición estimada.",
+        "confidence": "0 = menor nivel de confianza integral. 100 = mayor nivel de confianza considerando productor, riesgo y verificación."
+      }
+    }
+  ],
+  "regionStats": {
+    "pilot": "Arequipa",
+    "projection": "Escalable a nivel nacional",
+    "lastUpdate": "Julio 2026",
+    "sourcesCount": 8,
+    "cultivosMonitoreados": 3,
+    "surfaceProtectedHa": 45000,
+    "siniestralidadActual": 69.07,
+    "tractorAvg": 98.5,
+    "jornalAvg": 89.0,
+    "yuntaAvg": 180.0,
+    "climateStations": 2
+  },
+  "methodology": {
+    "risk": "Riesgo del proyecto = desempeño productivo, señal de mercado, clima, siniestralidad SAC y presión de costos.",
+    "producer": "Score del productor = verificación, experiencia, respaldo asociativo y preparación operativa.",
+    "confidence": "Confidence Index = combinación del score del productor, el riesgo del proyecto y el grado de verificación."
+  }
+}

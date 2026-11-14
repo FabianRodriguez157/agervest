@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Publicar proyecto agrícola — AgerVest</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<nav class="topbar" id="navbar"></nav>
+
+<section class="section">
+  <div class="container form-wrap">
+    <div class="card form-card">
+      <h1 class="form-title">🌾 Registrar proyecto agrícola</h1>
+      <p class="form-sub">Describe tu cultivo, la inversión requerida y los beneficios esperados para publicarlo en el catálogo.</p>
+
+      <form id="projectForm">
+        <!-- SECCIÓN 1: Información Básica del Proyecto -->
+        <div class="form-section">
+          <h3 style="border-bottom:2px solid var(--agv-gold);padding-bottom:8px;margin-bottom:16px;">📋 Información Básica</h3>
+          <div class="field">
+            <label>Título del proyecto *</label>
+            <input type="text" name="title" required placeholder="Ej. Ampliación de cultivo de quinua orgánica — Cosecha 2024" maxlength="100">
+            <small class="hint">Máx. 100 caracteres</small>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>Cultivo principal *</label>
+              <select name="crop" required>
+                <option value="">Selecciona…</option>
+                <option value="Quinua">Quinua</option>
+                <option value="Cafe">Café</option>
+                <option value="Palta">Palta</option>
+                <option value="Uva">Uva</option>
+                <option value="Papa">Papa</option>
+                <option value="Maiz">Maíz</option>
+                <option value="Fresas">Fresas</option>
+                <option value="Otro">Otro</option>
+              </select>
+            </div>
+            <div class="field"><label>Ubicación del cultivo *</label><input type="text" name="location" required placeholder="Puno, Perú - Distrito Pichacani"></div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 2: Descripción y Detalles -->
+        <div class="form-section">
+          <h3 style="border-bottom:2px solid var(--agv-gold);padding-bottom:8px;margin-bottom:16px;">📝 Descripción del Proyecto</h3>
+          <div class="field">
+            <label>Descripción general del proyecto *</label>
+            <textarea name="description" required placeholder="Describe el proyecto en detalle: estado actual del cultivo, área afectada, plan de trabajo, tecnología a usar, etc." maxlength="1000" rows="5"></textarea>
+            <small class="hint">Máx. 1000 caracteres</small>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>Área de cultivo (hectáreas) *</label>
+              <input type="number" step="0.1" min="0.1" name="projectAreaHa" required placeholder="4.5">
+            </div>
+            <div class="field">
+              <label>Variedad/Certificación del cultivo *</label>
+              <input type="text" name="cropVariety" required placeholder="Ej. Quinua Tío Kantu, Orgánica Certificada">
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 3: Financiero -->
+        <div class="form-section">
+          <h3 style="border-bottom:2px solid var(--agv-gold);padding-bottom:8px;margin-bottom:16px;">💰 Información Financiera</h3>
+          <div class="field-row">
+            <div class="field">
+              <label>Inversión total requerida (S/) *</label>
+              <input type="number" min="100" step="100" name="investmentNeeded" required placeholder="18000">
+              <small class="hint">Monto en soles peruanos</small>
+            </div>
+            <div class="field">
+              <label>Inversión ya disponible (S/) *</label>
+              <input type="number" min="0" step="100" name="amountAvailable" required placeholder="0">
+              <small class="hint">Dinero ya asignado, si aplica</small>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>Duración del ciclo (meses) *</label>
+              <input type="number" min="1" max="60" name="duration" required placeholder="8">
+              <small class="hint">De siembra a cosecha</small>
+            </div>
+            <div class="field">
+              <label>Retorno esperado (%) *</label>
+              <input type="number" min="0" max="200" step="0.5" name="expectedReturnPct" required placeholder="15">
+              <small class="hint">ROI estimado para el inversionista</small>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>Nivel de riesgo estimado *</label>
+              <select name="risk" required>
+                <option value="">Selecciona…</option>
+                <option value="bajo">🟢 Bajo — cultivo probado, condiciones óptimas</option>
+                <option value="medio" selected>🟡 Medio — factores de riesgo moderados</option>
+                <option value="alto">🔴 Alto — nuevas técnicas o condiciones adversas</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Forma de pago del retorno *</label>
+              <select name="paymentMethod" required>
+                <option value="">Selecciona…</option>
+                <option value="percentage">Porcentaje de cosecha</option>
+                <option value="fixed">Monto fijo al final</option>
+                <option value="monthly">Cuotas mensuales</option>
+                <option value="harvest">Al cierre de cosecha</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 4: Objetivos y Beneficios -->
+        <div class="form-section">
+          <h3 style="border-bottom:2px solid var(--agv-gold);padding-bottom:8px;margin-bottom:16px;">🎯 Objetivos y Beneficios</h3>
+          <div class="field">
+            <label>Objetivos específicos del proyecto *</label>
+            <textarea name="objectives" required placeholder="¿Qué se espera lograr con la inversión? Ej: Incrementar rendimiento 20%, expandir área cultivada, implementar riego goteo, etc." maxlength="800" rows="4"></textarea>
+            <small class="hint">Máx. 800 caracteres</small>
+          </div>
+          <div class="field">
+            <label>Beneficios esperados para el inversionista *</label>
+            <textarea name="benefits" required placeholder="Retorno específico, plazos de pago, garantías, compensaciones, acceso a información del proyecto, etc." maxlength="800" rows="4"></textarea>
+            <small class="hint">Máx. 800 caracteres</small>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 5: Gestión de Riesgos -->
+        <div class="form-section">
+          <h3 style="border-bottom:2px solid var(--agv-gold);padding-bottom:8px;margin-bottom:16px;">⚠️ Análisis de Riesgos</h3>
+          <div class="field">
+            <label>Posibles riesgos y mitigaciones *</label>
+            <textarea name="riskMitigation" required placeholder="Ej: Riesgo climático → sistema de riego. Plagas → control integrado. Mercado → contratos previos con compradores." maxlength="600" rows="4"></textarea>
+            <small class="hint">Cómo se mitigan los riesgos identificados</small>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>Cobertura de seguros *</label>
+              <select name="hasInsurance" required>
+                <option value="">Selecciona…</option>
+                <option value="yes">Sí, tengo seguro agrícola</option>
+                <option value="planning">Planificado asegurar</option>
+                <option value="no">No requiere seguro</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Experiencia previa con este cultivo *</label>
+              <select name="priorExperience" required>
+                <option value="">Selecciona…</option>
+                <option value="yes">Sí, he cultivado antes</option>
+                <option value="assisted">Con apoyo técnico</option>
+                <option value="new">Primera vez, con capacitación</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 6: Validaciones y Documentos -->
+        <div class="form-section">
+          <h3 style="border-bottom:2px solid var(--agv-gold);padding-bottom:8px;margin-bottom:16px;">📦 Validación y Documentos</h3>
+          <div class="field-row">
+            <div class="field">
+              <label>Certificación agrícola *</label>
+              <select name="certification" required>
+                <option value="">Selecciona…</option>
+                <option value="organic">Orgánica certificada</option>
+                <option value="conventional">Convencional</option>
+                <option value="in_transition">En transición a orgánica</option>
+                <option value="fair_trade">Fair Trade</option>
+                <option value="other">Otra certificación</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Socio técnico/asesor *</label>
+              <select name="technicalSupport" required>
+                <option value="">Selecciona…</option>
+                <option value="own_experience">Experiencia propia</option>
+                <option value="contractor">Contratado especialista</option>
+                <option value="government">Apoyo del Estado/MIDAGRI</option>
+                <option value="agro_company">Empresa agrícola</option>
+                <option value="other">Otro</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>Documentos de respaldo (simulado)</label>
+            <div class="upload-box" onclick="document.getElementById('docFile').click()">
+              📎 Adjunta: plano de terreno, planes de siembra, análisis de suelo, contratos, etc.
+              <input type="file" id="docFile" style="display:none" onchange="document.getElementById('docName').textContent = this.files[0]?.name || ''">
+            </div>
+            <small class="hint" id="docName">Documentos opcionales que fortalecen tu proyecto</small>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 7: Imagen y Multimedia -->
+        <div class="form-section">
+          <h3 style="border-bottom:2px solid var(--agv-gold);padding-bottom:8px;margin-bottom:16px;">📸 Multimedia</h3>
+          <div class="field">
+            <label>Foto del cultivo o terreno</label>
+            <div class="upload-box" onclick="document.getElementById('imgFile').click()">
+              🖼️ Haz clic para adjuntar una foto actual del cultivo/terreno
+              <input type="file" id="imgFile" style="display:none" onchange="document.getElementById('imgName').textContent = this.files[0]?.name || ''">
+            </div>
+            <small class="hint" id="imgName">Imágenes recientes ayudan a generar confianza</small>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 8: Términos -->
+        <div class="form-section">
+          <h3 style="border-bottom:2px solid var(--agv-gold);padding-bottom:8px;margin-bottom:16px;">✓ Acuerdos</h3>
+          <div class="checkbox-field">
+            <input type="checkbox" id="projectTerms" name="projectTermsAccepted" required>
+            <label for="projectTerms">Certifíco que la información proporcionada es veraz y asumo responsabilidad legal por ella *</label>
+          </div>
+          <div class="checkbox-field">
+            <input type="checkbox" id="projectDataPolicy" name="dataPolicy" required>
+            <label for="projectDataPolicy">Autorizo compartir esta información con inversionistas interesados *</label>
+          </div>
+          <div class="checkbox-field">
+            <input type="checkbox" id="projectUpdates" name="updatesAccepted" required>
+            <label for="projectUpdates">Me comprometo a proporcionar actualizaciones periódicas del proyecto *</label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top:20px;">Publicar proyecto en AgerVest</button>
+        <div class="form-msg" id="msg"></div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer id="footer"></footer>
+<script src="js/config.js"></script>
+<script src="js/common.js"></script>
+<script>
+renderNavbar('reg-farmer');
+
+async function requireFarmer() {
+  try {
+    const me = await API.get('/api/auth/me');
+    if (me.role !== 'farmer') {
+      window.location.href = me.role === 'investor' ? 'investor-dashboard.html' : 'login.html';
+      return false;
+    }
+    Session.setFarmer(me.user.id, me.user.name);
+    return true;
+  } catch (e) {
+    Session.clearLocal();
+    window.location.href = 'login.html';
+    return false;
+  }
+}
+
+requireFarmer();
+
+document.getElementById('projectForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const msg = document.getElementById('msg');
+
+  // Validaciones básicas
+  const investmentNeeded = Number(fd.get('investmentNeeded'));
+  const amountAvailable = Number(fd.get('amountAvailable'));
+  if (amountAvailable > investmentNeeded) {
+    msg.className = 'form-msg err';
+    msg.textContent = 'Error: La inversión disponible no puede ser mayor a la requerida';
+    return;
+  }
+
+  const payload = {
+    title: fd.get('title'),
+    crop: fd.get('crop'),
+    location: fd.get('location'),
+    description: fd.get('description'),
+    projectAreaHa: Number(fd.get('projectAreaHa')),
+    cropVariety: fd.get('cropVariety'),
+    investmentNeeded,
+    amountAvailable,
+    durationMonths: Number(fd.get('duration')),
+    expectedReturnPct: Number(fd.get('expectedReturnPct')),
+    risk: fd.get('risk'),
+    paymentMethod: fd.get('paymentMethod'),
+    objectives: fd.get('objectives'),
+    benefits: fd.get('benefits'),
+    riskMitigation: fd.get('riskMitigation'),
+    hasInsurance: fd.get('hasInsurance'),
+    priorExperience: fd.get('priorExperience'),
+    certification: fd.get('certification'),
+    technicalSupport: fd.get('technicalSupport'),
+    imageUrl: document.getElementById('imgFile').files[0]?.name,
+    documentUrl: document.getElementById('docFile').files[0]?.name,
+    termsAccepted: Boolean(document.getElementById('projectTerms')?.checked),
+    updatesAccepted: Boolean(document.getElementById('projectUpdates')?.checked),
+  };
+
+  if (!payload.termsAccepted) {
+    msg.className = 'form-msg err';
+    msg.textContent = 'Error: Debes aceptar los términos del proyecto';
+    return;
+  }
+  if (!payload.updatesAccepted) {
+    msg.className = 'form-msg err';
+    msg.textContent = 'Error: Debes comprometerte a proporcionar actualizaciones';
+    return;
+  }
+
+  try {
+    const project = await API.post('/api/projects', payload);
+    msg.className = 'form-msg ok';
+    msg.textContent = '¡Proyecto publicado! Redirigiendo a su detalle…';
+    setTimeout(() => { window.location.href = 'project-detail.html?id=' + project.id; }, 1200);
+  } catch (err) {
+    msg.className = 'form-msg err';
+    msg.textContent = 'Error: ' + err.message;
+  }
+});
+</script>
+</body>
+</html>

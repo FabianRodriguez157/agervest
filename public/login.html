@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Iniciar sesión — AgerVest</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<nav class="topbar" id="navbar"></nav>
+
+<section class="section">
+  <div class="container form-wrap">
+    <div class="card form-card">
+      <h1 class="form-title">Iniciar sesión</h1>
+      <p class="form-sub">Ingresa según tu tipo de cuenta en AgerVest.</p>
+
+      <div class="role-switch" id="roleSwitch">
+        <button type="button" class="active" data-role="farmer">🧑‍🌾 Soy agricultor</button>
+        <button type="button" data-role="investor">💰 Soy inversionista</button>
+        <button type="button" data-role="ally">🤝 Soy aliado</button>
+      </div>
+
+      <form id="loginForm">
+        <div class="field"><label>Correo electrónico *</label><input type="email" name="email" required placeholder="correo@ejemplo.com" autocomplete="email"></div>
+        <div class="field"><label>Contraseña *</label><input type="password" name="password" required placeholder="••••••••" autocomplete="current-password"></div>
+        <div class="checkbox-field">
+          <input type="checkbox" id="rememberMe" name="rememberMe">
+          <label for="rememberMe">Recuérdame en este dispositivo</label>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Ingresar</button>
+        <div class="form-msg" id="msg"></div>
+        <p style="text-align:center;font-size:13px;margin-top:10px;">
+          <a href="#" style="color:var(--agv-warning);" onclick="alert('Recuperación de contraseña — próximamente'); return false;">¿Olvidaste tu contraseña?</a>
+        </p>
+      </form>
+
+      <p class="form-sub" style="margin-top:18px;text-align:center;">
+        ¿No tienes cuenta?
+        <a id="registerLink" href="register-farmer.html" style="color:var(--agv-green);font-weight:700;">Regístrate como agricultor</a>
+      </p>
+
+      <div class="info-block" style="margin-top:10px;border-top:1px solid var(--agv-border);padding-top:16px;">
+        <h4>🔒 Confianza y verificación</h4>
+        <p style="font-size:13px;">Los perfiles de agricultores en AgerVest pueden ser contrastados contra el
+        <a href="https://sidea.midagri.gob.pe/" target="_blank" rel="noopener" style="color:var(--agv-green);font-weight:700;">Sistema de Información para el Desarrollo Agrario (SIDEA) del MIDAGRI</a>,
+        como fuente oficial adicional de verificación agraria. <em>Enlace referencial — integración simulada en este prototipo.</em></p>
+      </div>
+
+      <p class="form-sub" style="margin-top:10px;font-size:11.5px;text-align:center;">Cuentas demo: rosa.quispe@agervest.pe / daniela.fernandez@mail.com / aliado@agervest.pe — contraseña: demo123 o Demo1234 según la cuenta</p>
+    </div>
+  </div>
+</section>
+
+<footer id="footer"></footer>
+<script src="js/config.js"></script>
+<script src="js/common.js"></script>
+<script>
+renderNavbar('login');
+
+let selectedRole = 'farmer';
+document.querySelectorAll('#roleSwitch button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#roleSwitch button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedRole = btn.dataset.role;
+    const link = document.getElementById('registerLink');
+    if (selectedRole === 'farmer') {
+      link.href = 'register-farmer.html';
+      link.textContent = 'Regístrate como agricultor';
+    } else if (selectedRole === 'investor') {
+      link.href = 'register-investor.html';
+      link.textContent = 'Regístrate como inversionista';
+    } else {
+      link.href = 'register-ally.html';
+      link.textContent = 'Regístrate como aliado / asociación';
+    }
+  });
+});
+
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const msg = document.getElementById('msg');
+  const email = String(fd.get('email')).trim();
+  const password = String(fd.get('password'));
+  const rememberMe = document.getElementById('rememberMe')?.checked;
+
+  // Validaciones básicas
+  if (!email || !password) {
+    msg.className = 'form-msg err';
+    msg.textContent = 'Error: Correo y contraseña son requeridos';
+    return;
+  }
+  if (password.length < 4) {
+    msg.className = 'form-msg err';
+    msg.textContent = 'Error: Contraseña inválida';
+    return;
+  }
+
+  try {
+    const data = await API.post('/api/auth/login', {
+      email, password, role: selectedRole, rememberMe,
+    });
+    if (data.role === 'farmer') {
+      Session.setFarmer(data.user.id, data.user.name);
+      msg.className = 'form-msg ok';
+      msg.textContent = `Bienvenido, ${data.user.name}. Redirigiendo…`;
+      setTimeout(() => { window.location.href = 'farmer-dashboard.html'; }, 900);
+    } else if (data.role === 'investor') {
+      Session.setInvestor(data.user.id, data.user.name);
+      msg.className = 'form-msg ok';
+      msg.textContent = `Bienvenido, ${data.user.name}. Redirigiendo…`;
+      setTimeout(() => { window.location.href = 'investor-dashboard.html'; }, 900);
+    } else {
+      Session.setAlly(data.user.id, data.user.name);
+      msg.className = 'form-msg ok';
+      msg.textContent = `Bienvenido, ${data.user.name}. Redirigiendo…`;
+      setTimeout(() => { window.location.href = 'ally-dashboard.html'; }, 900);
+    }
+  } catch (err) {
+    msg.className = 'form-msg err';
+    msg.textContent = 'Error: ' + err.message;
+  }
+});
+</script>
+</body>
+</html>

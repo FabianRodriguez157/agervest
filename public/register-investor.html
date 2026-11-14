@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro de inversionista — AgerVest</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<nav class="topbar" id="navbar"></nav>
+
+<section class="section">
+  <div class="container form-wrap">
+    <div class="card form-card">
+      <h1 class="form-title">💰 Registro de inversionista</h1>
+      <p class="form-sub">Crea tu cuenta para invertir en proyectos agrícolas verificados y dar seguimiento a tu portafolio.</p>
+      <div class="step-indicator"><div class="step-dot done"></div><div class="step-dot done"></div><div class="step-dot"></div></div>
+
+      <div class="legal-intro">
+        <div class="legal-icon">⚖</div>
+        <div>
+          <strong>Información legal, privacidad y riesgos</strong>
+          <p>La decisión de inversión debe basarse en la información disponible y en tu propia evaluación. Lee los documentos antes de registrarte.</p>
+          <div class="legal-links">
+            <button type="button" class="legal-link" onclick="openLegalModal('terms')">Términos y condiciones</button>
+            <button type="button" class="legal-link" onclick="openLegalModal('privacy')">Política de privacidad</button>
+            <button type="button" class="legal-link" onclick="openLegalModal('risk')">Aviso de riesgos</button>
+          </div>
+        </div>
+      </div>
+      <form id="investorForm">
+        <!-- SECCIÓN 1: Datos Personales -->
+        <div class="form-section">
+          <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;">👤 Datos Personales</h3>
+          <div class="field-row">
+            <div class="field"><label>Nombre completo *</label><input type="text" name="name" required placeholder="Ej. Daniela Fernández"></div>
+            <div class="field"><label>Teléfono de contacto *</label><input type="tel" name="phone" required placeholder="+51987654321"></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Correo electrónico *</label><input type="email" name="email" required placeholder="correo@ejemplo.com"></div>
+            <div class="field">
+              <label>País de residencia *</label>
+              <select name="country" required>
+                <option value="">Selecciona…</option>
+                <option value="PE">Perú</option>
+                <option value="MX">México</option>
+                <option value="CO">Colombia</option>
+                <option value="CL">Chile</option>
+                <option value="AR">Argentina</option>
+                <option value="BO">Bolivia</option>
+                <option value="EC">Ecuador</option>
+                <option value="OTHER">Otro</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 2: Seguridad -->
+        <div class="form-section">
+          <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;">🔒 Seguridad</h3>
+          <div class="field">
+            <label>Contraseña *</label>
+            <input type="password" name="password" id="invPassword" required minlength="8" placeholder="••••••••" title="Mín. 8 caracteres, 1 mayúscula, 1 número">
+            <small class="hint" id="invPwdHint" style="color:var(--agv-warning);">Mín. 8 caracteres, incluir mayúscula y número</small>
+          </div>
+          <div class="field">
+            <label>Confirmar contraseña *</label>
+            <input type="password" name="confirmPassword" id="confirmInvPassword" required placeholder="••••••••">
+          </div>
+        </div>
+
+        <!-- SECCIÓN 3: Identificación -->
+        <div class="form-section">
+          <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;">📋 Identificación</h3>
+          <div class="field-row">
+            <div class="field">
+              <label>Tipo de documento *</label>
+              <select name="documentIdType" required>
+                <option value="">Selecciona…</option>
+                <option value="DNI">DNI</option>
+                <option value="CE">Carné de Extranjería (CE)</option>
+                <option value="PASSPORT">Pasaporte</option>
+              </select>
+            </div>
+            <div class="field"><label>Número de documento *</label><input type="text" name="documentId" required placeholder="70123456"></div>
+          </div>
+          <div class="field"><label>Ocupación principal *</label><input type="text" name="occupation" required placeholder="Ej. Ingeniera, comerciante, profesional…"></div>
+        </div>
+
+        <!-- SECCIÓN 4: Experiencia e Inversión -->
+        <div class="form-section">
+          <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;">📊 Experiencia en Inversiones</h3>
+          <div class="field-row">
+            <div class="field">
+              <label>Experiencia en inversiones *</label>
+              <select name="investmentExperience" required>
+                <option value="">Selecciona…</option>
+                <option value="none">Sin experiencia — es mi primera inversión</option>
+                <option value="basic">Básica — he invertido en 1-2 proyectos</option>
+                <option value="intermediate">Intermedia — tengo experiencia con varios proyectos</option>
+                <option value="advanced">Avanzada — soy inversionista experimentado</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Frecuencia de inversión *</label>
+              <select name="investmentFrequency" required>
+                <option value="">Selecciona…</option>
+                <option value="monthly">Mensualmente</option>
+                <option value="quarterly">Trimestralmente</option>
+                <option value="annual">Anualmente</option>
+                <option value="sporadic">Esporádicamente</option>
+              </select>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Presupuesto de inversión estimado (S/) *</label><input type="number" min="100" step="100" name="investmentBudget" required placeholder="10000"></div>
+            <div class="field">
+              <label>Perfil de riesgo *</label>
+              <select name="riskProfile" required>
+                <option value="">Selecciona…</option>
+                <option value="conservador">Conservador — bajo riesgo, retorno estable</option>
+                <option value="moderado">Moderado — riesgo medio, retorno balanceado</option>
+                <option value="agresivo">Agresivo — alto retorno, tolero riesgo alto</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 5: Información de Pago -->
+        <div class="form-section">
+          <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;">💳 Información de Pago</h3>
+          <div class="field-row">
+            <div class="field">
+              <label>Método de pago preferido *</label>
+              <select name="paymentMethod" required>
+                <option value="">Selecciona…</option>
+                <option value="bank_transfer">Transferencia bancaria</option>
+                <option value="wallet">Billetera digital</option>
+                <option value="credit_card">Tarjeta de crédito</option>
+              </select>
+            </div>
+            <div class="field"><label>Número de cuenta bancaria *</label><input type="text" name="bankAccount" required placeholder="Ej. 00000123456789"></div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 6: Términos y Condiciones -->
+        <div class="form-section">
+          <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;">✓ Acuerdos</h3>
+          <div class="legal-consent">
+            <div class="checkbox-field">
+              <input type="checkbox" id="invTerms" name="termsAccepted" required>
+              <label for="invTerms">He leído y acepto los <button type="button" class="legal-link" onclick="openLegalModal('terms')">términos y condiciones</button> de AgerVest *</label>
+            </div>
+            <div class="checkbox-field">
+              <input type="checkbox" id="invDataPolicy" name="dataPolicy" required>
+              <label for="invDataPolicy">He leído la <button type="button" class="legal-link" onclick="openLegalModal('privacy')">política de privacidad</button> y autorizo el tratamiento de mis datos para las finalidades informadas *</label>
+            </div>
+            <div class="checkbox-field">
+              <input type="checkbox" id="invRiskAck" name="riskAcknowledgment" required>
+              <label for="invRiskAck">Reconozco los riesgos y he leído el <button type="button" class="legal-link" onclick="openLegalModal('risk')">aviso de riesgos de inversión</button> *</label>
+            </div>
+            <span class="legal-version">Versión informativa: octubre de 2026 · El contenido legal del prototipo debe ser revisado antes de un uso comercial.</span>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top:20px;">Crear cuenta de inversionista</button>
+        <div class="form-msg" id="msg"></div>
+      </form>
+
+      <p class="form-sub" style="margin-top:16px;text-align:center;">¿Ya tienes cuenta? <a href="login.html" style="color:var(--agv-green);font-weight:700;">Inicia sesión</a></p>
+    </div>
+  </div>
+</section>
+
+<footer id="footer"></footer>
+<script src="js/config.js"></script>
+<script src="js/common.js"></script>
+<script>
+renderNavbar('reg-investor');
+
+const invPwdInput = document.getElementById('invPassword');
+invPwdInput?.addEventListener('input', (e) => {
+  const pwd = e.target.value;
+  const hint = document.getElementById('invPwdHint');
+  const valid = pwd.length >= 8 && /[A-Z]/.test(pwd) && /\d/.test(pwd);
+  if (hint) hint.style.color = valid ? 'var(--agv-success)' : 'var(--agv-warning)';
+});
+
+document.getElementById('investorForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const msg = document.getElementById('msg');
+
+  // Validaciones
+  if (!document.getElementById('invTerms')?.checked || !document.getElementById('invDataPolicy')?.checked || !document.getElementById('invRiskAck')?.checked) {
+    msg.className = 'form-msg err';
+    msg.textContent = 'Debes revisar y aceptar los acuerdos legales requeridos.';
+    return;
+  }
+  const pwd = String(fd.get('password'));
+  const confirmPwd = String(fd.get('confirmPassword'));
+  if (pwd !== confirmPwd) {
+    msg.className = 'form-msg err';
+    msg.textContent = 'Error: Las contraseñas no coinciden';
+    return;
+  }
+  if (!/[A-Z]/.test(pwd) || !/\d/.test(pwd) || pwd.length < 8) {
+    msg.className = 'form-msg err';
+    msg.textContent = 'Error: Contraseña debe tener 8+ caracteres, mayúscula y número';
+    return;
+  }
+
+  const payload = {
+    name: fd.get('name'), email: fd.get('email'), password: pwd, phone: fd.get('phone'),
+    documentId: fd.get('documentId'), documentIdType: fd.get('documentIdType'),
+    occupation: fd.get('occupation'), country: fd.get('country'),
+    investmentExperience: fd.get('investmentExperience'),
+    investmentFrequency: fd.get('investmentFrequency'),
+    investmentBudget: Number(fd.get('investmentBudget')),
+    riskProfile: fd.get('riskProfile'), bankAccount: fd.get('bankAccount'),
+    paymentMethod: fd.get('paymentMethod'),
+    termsAccepted: Boolean(document.getElementById('invTerms')?.checked),
+    dataPolicyAccepted: Boolean(document.getElementById('invDataPolicy')?.checked),
+    riskAcknowledgment: Boolean(document.getElementById('invRiskAck')?.checked),
+  };
+
+  try {
+    const investor = await API.post('/api/auth/register-investor', payload);
+    Session.setInvestor(investor.id, investor.name);
+    msg.className = 'form-msg ok';
+    msg.textContent = `¡Cuenta creada! Bienvenido, ${investor.name}. Redirigiendo…`;
+    setTimeout(() => { window.location.href = 'investor-dashboard.html'; }, 1200);
+  } catch (err) {
+    msg.className = 'form-msg err';
+    msg.textContent = 'Error: ' + err.message;
+  }
+});
+</script>
+</body>
+</html>

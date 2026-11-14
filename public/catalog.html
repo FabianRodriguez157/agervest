@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catálogo de oportunidades — AgerVest</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<nav class="topbar" id="navbar"></nav>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <div><h2>Catálogo de oportunidades</h2><p class="sub">Explora proyectos agrícolas verificados y elige dónde invertir</p></div>
+    </div>
+
+    <div class="filters-bar">
+      <input type="text" id="fQ" class="grow" placeholder="Buscar por proyecto, cultivo o ubicación…">
+      <select id="fCrop"><option value="">Todos los cultivos</option></select>
+      <select id="fRisk">
+        <option value="">Todos los riesgos</option>
+        <option value="bajo">Riesgo bajo</option>
+        <option value="medio">Riesgo medio</option>
+        <option value="alto">Riesgo alto</option>
+      </select>
+      <select id="fStatus">
+        <option value="">Todos los estados</option>
+        <option value="active">Activo</option>
+        <option value="funded">Financiado</option>
+        <option value="completed">Completado</option>
+      </select>
+      <button class="btn btn-dark btn-sm" onclick="applyFilters()">Filtrar</button>
+    </div>
+
+    <div id="catalogAnalyticsOverview" style="margin-bottom:22px;"></div>
+    <div class="grid grid-3" id="grid"><div class="loading">Cargando oportunidades…</div></div>
+  </div>
+</section>
+
+<footer id="footer"></footer>
+<script src="js/config.js"></script>
+<script src="js/common.js"></script>
+<script src="js/agervest-v3-data.js"></script>
+<script src="js/agervest-analytics.js"></script>
+<script>
+renderNavbar('catalog');
+
+const CROPS = ['Quinua', 'Cafe', 'Palta', 'Uva', 'Papa', 'Otro'];
+document.getElementById('fCrop').innerHTML += CROPS.map(c => `<option value="${c}">${c}</option>`).join('');
+
+async function applyFilters() {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '<div class="loading">Cargando oportunidades…</div>';
+  const params = new URLSearchParams();
+  const q = document.getElementById('fQ').value.trim();
+  const crop = document.getElementById('fCrop').value;
+  const risk = document.getElementById('fRisk').value;
+  const status = document.getElementById('fStatus').value;
+  if (q) params.set('q', q);
+  if (crop) params.set('crop', crop);
+  if (risk) params.set('risk', risk);
+  if (status) params.set('status', status);
+  try {
+    const projects = await API.get('/api/projects?' + params.toString());
+    if (!projects.length) { grid.innerHTML = '<div class="empty-state">No se encontraron proyectos con esos filtros.</div>'; return; }
+    grid.innerHTML = projects.map(cardHtml).join('');
+  } catch (e) {
+    grid.innerHTML = '<div class="empty-state">Error al cargar proyectos.</div>';
+  }
+}
+
+function cardHtml(p) {
+  const pct = Math.min(100, Math.round((p.amountRaised / p.investmentNeeded) * 100));
+  return `
+  <a class="card project-card" href="project-detail.html?id=${p.id}">
+    <div class="thumb-wrap">
+      <img class="thumb" src="${p.imageUrl}" alt="${p.title}">
+      <span class="chip risk-${p.risk}">${riskLabel(p.risk)}</span>
+      <span class="chip status">${statusLabel(p.status)}</span>
+    </div>
+    <div class="body">
+      <h3>${p.title}</h3>
+      <div class="meta"><span>📍 ${p.location}</span><span>🌾 ${p.crop}</span><span>⏱ ${p.durationMonths} meses</span></div><div class="meta"><span>👨‍🌾 Productor ${p.producerScore ?? "—"}/100</span><span>📊 Riesgo ${p.riskScorePct !== undefined ? p.riskScorePct+"%" : "—"}</span><span>🛡️ Confianza ${p.confidenceIndex ?? "—"}/100</span></div>
+      <div class="progress-bar"><div class="fill" style="width:${pct}%"></div></div>
+      <div class="stats-row">
+        <span><b>${fmtMoney(p.amountRaised)}</b> de ${fmtMoney(p.investmentNeeded)} · ${pct}%</span>
+        <span class="return-tag">+${p.expectedReturnPct}%</span>
+      </div>
+    </div>
+  </a>`;
+}
+
+AgerVestAnalytics.renderOverview('catalogAnalyticsOverview');
+applyFilters();
+</script>
+</body>
+</html>
