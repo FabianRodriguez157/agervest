@@ -150,7 +150,8 @@ RETURNS TABLE(
         COALESCE(SUM(commission), 0),
         COALESCE(SUM(net_to_farmer), 0),
         COALESCE(AVG(commission), 0),
-        0.06::NUMERIC;
+        0.06::NUMERIC
+      FROM platform_earnings;
 $$;
 
 -- Admin: ingreso detallado por inversión, con nombres
