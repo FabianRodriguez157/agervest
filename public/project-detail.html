@@ -58,6 +58,24 @@ async function load() {
   try {
     const { project: p, farmer, token, updates, investorsCount, riskAssessment: ra } = await AgerVestAPI.getProject(projectId);
     const pct = Math.min(100, Math.round((p.amountRaised / p.investmentNeeded) * 100));
+    const CROP_SEASON = {
+      'Palta':  { ciclo:'Perenne, cosechas anuales', siembra:'Instalación en Abr–Jun', cosecha:'May–Ago', climaIdeal:'15–25 °C, baja humedad',
+                  riesgosClimaticos:['Heladas puntuales en floración','Vientos fuertes en cuaje','Sequías prolongadas'],
+                  regionClima:'Costa y sierra baja templada, semiárida.', regionRiesgos:['Déficit hídrico estacional','Oscilación térmica día-noche'] },
+      'Cafe':   { ciclo:'Perenne, floración anual', siembra:'Nov–Ene', cosecha:'Abr–Set', climaIdeal:'18–24 °C, 1500–2000 mm anuales',
+                  riesgosClimaticos:['Roya amarilla','Broca del café','Lluvias intensas en cosecha'],
+                  regionClima:'Selva alta, nubosidad frecuente, lluvias regulares.', regionRiesgos:['Granizo esporádico','Deslizamientos por lluvia'] },
+      'Quinua': { ciclo:'Anual, 5–7 meses', siembra:'Set–Nov', cosecha:'Abr–May', climaIdeal:'8–20 °C, resistente a sequía',
+                  riesgosClimaticos:['Heladas en floración','Mildiu por lluvia excesiva','Granizo en grano lechoso'],
+                  regionClima:'Altiplano andino, estación seca y lluviosa marcadas.', regionRiesgos:['Heladas nocturnas','Veranillos'] },
+      'Uva':    { ciclo:'Perenne, 1–2 cosechas/año', siembra:'Poda principal Jun–Ago', cosecha:'Nov–Feb', climaIdeal:'20–30 °C, humedad baja',
+                  riesgosClimaticos:['Granizo en racimo','Oídio y mildiu','Lluvias en cosecha'],
+                  regionClima:'Costa cálida y seca, alta insolación.', regionRiesgos:['Fenómeno El Niño','Nieblas costeras'] },
+      'Papa':   { ciclo:'Anual, 4–6 meses', siembra:'Oct–Dic', cosecha:'Abr–Jun', climaIdeal:'10–20 °C, suelos sueltos',
+                  riesgosClimaticos:['Rancha (tizón tardío)','Heladas','Granizo'],
+                  regionClima:'Sierra, lluvias concentradas Dic–Mar.', regionRiesgos:['Sequías','Plagas de suelo'] },
+    };
+    const si = CROP_SEASON[p.crop] || { ciclo:'—', siembra:'—', cosecha:'—', climaIdeal:'—', riesgosClimaticos:[], regionClima:'—', regionRiesgos:[] };
     content.innerHTML = `
     <div class="detail-grid">
       <div>
