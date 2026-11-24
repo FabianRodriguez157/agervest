@@ -32,4 +32,26 @@ router.post('/farmers/:id/validate', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
+router.get('/verifications', async (_req, res, next) => {
+  try {
+    res.json(await AdminRepo.listPendingVerifications());
+  } catch (e) { next(e); }
+});
+
+const decisionSchema = z.object({ notes: z.string().max(500).optional() });
+
+router.post('/verifications/:userId/approve', async (req, res, next) => {
+  try {
+    const { notes } = decisionSchema.parse(req.body);
+    res.json(await AdminRepo.approveVerification(req.params.userId, notes));
+  } catch (e) { next(e); }
+});
+
+router.post('/verifications/:userId/reject', async (req, res, next) => {
+  try {
+    const { notes } = decisionSchema.parse(req.body);
+    res.json(await AdminRepo.rejectVerification(req.params.userId, notes));
+  } catch (e) { next(e); }
+});
+
 export default router;

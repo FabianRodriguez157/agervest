@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { verifyToken, JwtPayload, UserRole } from '../lib/jwt';
 import { config } from '../lib/config';
 import { Unauthorized, Forbidden } from '../lib/errors';
+import { callFnOne } from '../lib/db';
 
 declare global {
   namespace Express {
@@ -34,6 +35,16 @@ export function authRequired(req: Request, _res: Response, next: NextFunction) {
   } catch {
     next(Unauthorized('Sesión inválida o expirada'));
   }
+}
+
+export async function verifiedRequired(req: Request, _res: Response, next: NextFunction) {
+  if (!req.auth) return next(Unauthorized('Debes iniciar sesión'));
+  if (req.auth.role === 'admin') return next();
+  try {
+    const row = await callFnOne<any>('fn_get_verification_state', [req.auth.sub]);
+    if (!row?.verified) return next(Forbidden('Debes verificar tu cuenta antes de realizar esta acción'));
+    next();
+  } catch (e) { next(e); }
 }
 
 export function requireRole(...roles: UserRole[]) {

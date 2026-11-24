@@ -38,6 +38,20 @@ img { max-width: 100%; display: block; }
 .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; letter-spacing: 0.5px; color: inherit; text-decoration: none; }
 .brand .leaf { color: var(--agv-gold-light); font-size: 22px; }
 .brand-logo { height: 32px; width: auto; display: block; object-fit: contain; }
+
+.verify-banner { display: flex; align-items: center; gap: 16px; padding: 14px 18px; border-radius: 10px; margin: 16px 0; font-size: 14px; border: 1px solid; }
+.verify-banner.none { background: #fff6e4; border-color: #f0c674; color: #7a5200; }
+.verify-banner.pending { background: #e8f1ff; border-color: #96bbf0; color: #1a4b8c; }
+.verify-banner > div:first-child { flex: 1; }
+.verify-banner .icon-inline { margin-right: 4px; }
+
+.deposit-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); align-items: center; justify-content: center; z-index: 100; }
+.deposit-modal.open { display: flex; }
+.deposit-modal .modal-content { background: #fff; border-radius: 14px; padding: 24px; width: min(440px, 92vw); box-shadow: 0 20px 50px rgba(0,0,0,.25); }
+.deposit-modal h3 { margin: 0 0 12px; }
+.deposit-modal .deposit-spinner { display: flex; align-items: center; justify-content: center; padding: 30px 0; gap: 12px; }
+.deposit-modal .spinner { width: 28px; height: 28px; border: 3px solid #e2e8f0; border-top-color: var(--agv-green); border-radius: 50%; animation: dspin 0.8s linear infinite; }
+@keyframes dspin { to { transform: rotate(360deg); } }
 .icon-inline { width: 16px; height: 16px; vertical-align: -3px; display: inline-block; stroke-width: 2; }
 .icon-sm { width: 14px; height: 14px; }
 .icon-md { width: 20px; height: 20px; }

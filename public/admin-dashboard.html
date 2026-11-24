@@ -21,17 +21,31 @@ async function load() {
                     : me.role === 'ally' ? 'ally-dashboard.html' : 'login.html';
       return;
     }
-    const [metrics, farmers] = await Promise.all([
+    const [metrics, farmers, pending] = await Promise.all([
       API.get('/api/admin/metrics'),
       API.get('/api/admin/farmers'),
+      API.get('/api/admin/verifications'),
     ]);
-    render(c, me.user, metrics, farmers);
+    render(c, me.user, metrics, farmers, pending);
   } catch (e) {
     c.innerHTML = '<div class="empty-state">No se pudo cargar el panel. <a href="login.html">Volver al inicio de sesión</a></div>';
   }
 }
 
-function render(c, admin, m, farmers) {
+function render(c, admin, m, farmers, pending) {
+  const roleLabel = { farmer: 'Agricultor', investor: 'Inversionista', ally: 'Aliado' };
+  const pendingRows = pending.length ? pending.map(u => `
+    <tr>
+      <td><div style="font-weight:700;">${u.name}</div><div style="font-size:12px;color:var(--agv-muted);">${u.email}</div></td>
+      <td><span class="status-pill">${roleLabel[u.role] || u.role}</span></td>
+      <td>${u.phone || '—'}</td>
+      <td style="font-size:12px;color:var(--agv-muted);">${new Date(u.verificationRequestedAt).toLocaleString('es-PE')}</td>
+      <td style="white-space:nowrap;">
+        <button class="btn btn-sm btn-primary" onclick="decideVerification('${u.id}', 'approve')"><i data-lucide="check" class="icon-inline"></i> Aprobar</button>
+        <button class="btn btn-sm btn-outline" onclick="decideVerification('${u.id}', 'reject')"><i data-lucide="x" class="icon-inline"></i> Rechazar</button>
+      </td>
+    </tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--agv-muted);padding:20px;">Sin solicitudes pendientes.</td></tr>';
+
   const rows = farmers.map(f => `
     <tr>
       <td><div style="font-weight:700;">${f.name}</div><div style="font-size:12px;color:var(--agv-muted);">${f.email}</div></td>
@@ -76,6 +90,14 @@ function render(c, admin, m, farmers) {
     </div>
 
     <div class="card table-card" style="margin-top:28px;">
+      <h3>Solicitudes de verificación pendientes <span style="font-size:14px;color:var(--agv-muted);font-weight:400;">(${pending.length})</span></h3>
+      <table>
+        <thead><tr><th>Usuario</th><th>Rol</th><th>Teléfono</th><th>Solicitado</th><th></th></tr></thead>
+        <tbody>${pendingRows}</tbody>
+      </table>
+    </div>
+
+    <div class="card table-card" style="margin-top:28px;">
       <h3>Agricultores</h3>
       <table>
         <thead><tr>
@@ -92,6 +114,16 @@ function render(c, admin, m, farmers) {
 async function toggleValidation(id, validated) {
   try {
     await API.post(`/api/admin/farmers/${id}/validate`, { validated });
+    load();
+  } catch (e) {
+    alert('Error: ' + (e.message || e));
+  }
+}
+
+async function decideVerification(userId, decision) {
+  const notes = decision === 'reject' ? (prompt('Motivo del rechazo (opcional):') || '') : '';
+  try {
+    await API.post(`/api/admin/verifications/${userId}/${decision}`, { notes });
     load();
   } catch (e) {
     alert('Error: ' + (e.message || e));

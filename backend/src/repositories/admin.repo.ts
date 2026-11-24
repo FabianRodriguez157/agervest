@@ -58,3 +58,26 @@ export async function setFarmerValidation(id: string, validated: boolean, trustS
   const row = await callFnOne<any>('fn_admin_set_farmer_validation', [id, validated, trustScore ?? null]);
   return row;
 }
+
+export async function listPendingVerifications() {
+  const rows = await callFn<any>('fn_admin_list_pending_verifications');
+  return rows.map(r => ({
+    id: r.id,
+    email: r.email,
+    name: r.name,
+    role: r.role,
+    phone: r.phone,
+    verificationRequestedAt: r.verification_requested_at,
+    createdAt: r.created_at,
+  }));
+}
+
+export async function approveVerification(userId: string, notes?: string) {
+  const row = await callFnOne<any>('fn_admin_approve_verification', [userId, notes ?? null]);
+  return { id: row.id, verified: row.verified, verificationDecidedAt: row.verification_decided_at };
+}
+
+export async function rejectVerification(userId: string, notes?: string) {
+  const row = await callFnOne<any>('fn_admin_reject_verification', [userId, notes ?? null]);
+  return { id: row.id, verified: row.verified, verificationDecidedAt: row.verification_decided_at };
+}

@@ -110,6 +110,31 @@ function renderFooter() {
 }
 
 function renderIcons() { if (window.lucide) window.lucide.createIcons(); }
+
+function verificationBannerHtml(user) {
+  if (!user || user.verified) return '';
+  const requested = !!user.verificationRequestedAt;
+  if (requested) {
+    return `<div class="verify-banner pending">
+      <div><i data-lucide="hourglass" class="icon-inline"></i> <strong>Verificación en revisión.</strong> Un administrador validará tu cuenta pronto. Mientras tanto no podrás invertir ni publicar proyectos.</div>
+    </div>`;
+  }
+  return `<div class="verify-banner none">
+    <div><i data-lucide="alert-triangle" class="icon-inline"></i> <strong>Tu cuenta no está verificada.</strong> Para invertir, publicar proyectos u operar con dinero real, necesitas solicitar verificación.</div>
+    <button class="btn btn-primary btn-sm" onclick="requestVerification(this)"><i data-lucide="shield-check" class="icon-inline"></i> Solicitar verificación</button>
+  </div>`;
+}
+
+async function requestVerification(btn) {
+  if (btn) { btn.disabled = true; btn.textContent = 'Enviando…'; }
+  try {
+    await API.post('/api/auth/request-verification', {});
+    location.reload();
+  } catch (e) {
+    alert('No se pudo enviar la solicitud: ' + (e.message || e));
+    if (btn) { btn.disabled = false; btn.textContent = 'Reintentar'; }
+  }
+}
 document.addEventListener('DOMContentLoaded', () => {
   renderFooter();
   renderIcons();

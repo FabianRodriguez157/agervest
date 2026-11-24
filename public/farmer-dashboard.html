@@ -38,6 +38,7 @@
 <script>
 renderNavbar('farmer-dash');
 let currentFarmerId = null;
+let currentMe = null;
 let targetProjectForUpdate = null;
 
 async function initFarmerDashboard() {
@@ -49,6 +50,7 @@ async function initFarmerDashboard() {
     }
     Session.setFarmer(data.user.id, data.user.name);
     currentFarmerId = data.user.id;
+    currentMe = data.user;
     await loadDashboard();
   } catch (e) {
     Session.clearLocal();
@@ -62,10 +64,11 @@ async function loadDashboard() {
   try {
     const { farmer, projects, totalRaised, activeProjects, walletBalance, pendingObligations, transactions } = await AgerVestAPI.getFarmerDashboard(currentFarmerId);
     content.innerHTML = `
+    ${verificationBannerHtml(currentMe || farmer)}
     <div class="dash-header">
       <div class="who">
         <div class="avatar">${initials(farmer.name)}</div>
-        <div><h1>${farmer.name}</h1><div class="sub">${farmer.location} · ${farmer.cropType} · ${farmer.areaHa} ha ${farmer.validated ? '· <span style="color:var(--agv-green);font-weight:700;"><i data-lucide="check-circle-2" class="icon-inline"></i> Validado</span>' : '· ⏳ Pendiente de validación'}</div></div>
+        <div><h1>${farmer.name}</h1><div class="sub">${farmer.location} · ${farmer.cropType} · ${farmer.areaHa} ha ${farmer.validated ? '· <span style="color:var(--agv-green);font-weight:700;"><i data-lucide="check-circle-2" class="icon-inline"></i> Validado</span>' : '· <i data-lucide="hourglass" class="icon-inline"></i> Pendiente de validación'}</div></div>
       </div>
       <a href="register-project.html" class="btn btn-primary">+ Publicar nuevo proyecto</a>
     </div>

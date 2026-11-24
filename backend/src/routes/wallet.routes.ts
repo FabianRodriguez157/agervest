@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import * as TransactionsRepo from '../repositories/transactions.repo';
+import { callFnOne } from '../lib/db';
 import { authRequired, requireRole } from '../middleware/auth';
 import { BadRequest } from '../lib/errors';
 
@@ -45,6 +46,19 @@ router.post('/process-due-returns', authRequired, requireRole('ally', 'admin'), 
 router.post('/settle-project/:projectId', authRequired, requireRole('ally', 'admin'), async (req, res, next) => {
   try { res.json({ paid: await TransactionsRepo.settleProject(req.params.projectId) }); }
   catch (e) { next(e); }
+});
+
+// Depósito simulado (investor/farmer)
+const depositSchema = z.object({
+  amount: z.coerce.number().positive(),
+  bankAccount: z.string().min(5),
+});
+router.post('/deposit', authRequired, async (req, res, next) => {
+  try {
+    const { amount, bankAccount } = depositSchema.parse(req.body);
+    const row = await callFnOne<any>('fn_wallet_deposit', [req.auth!.sub, amount, bankAccount]);
+    res.json({ transactionId: row.tx_id, newBalance: Number(row.new_balance) });
+  } catch (e) { next(e); }
 });
 
 export default router;

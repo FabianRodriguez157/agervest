@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import * as ProjectsService from '../services/projects.service';
 import * as ProjectsRepo from '../repositories/projects.repo';
-import { authRequired, requireRole } from '../middleware/auth';
+import { authRequired, requireRole, verifiedRequired } from '../middleware/auth';
 import { NotFound } from '../lib/errors';
 
 const router = Router();
@@ -33,7 +33,7 @@ const createProjectSchema = z.object({
   updatesAccepted: z.literal(true),
 });
 
-router.post('/', authRequired, requireRole('farmer'), async (req, res, next) => {
+router.post('/', authRequired, requireRole('farmer'), verifiedRequired, async (req, res, next) => {
   try {
     const data = createProjectSchema.parse(req.body);
     const project = await ProjectsService.createProject({ ...data, farmerId: req.auth!.sub });

@@ -14,17 +14,24 @@
 </section>
 
 <div class="modal-overlay" id="investModal">
-  <div class="modal">
-    <h3>Invertir en este proyecto</h3>
+  <div class="modal" id="investModalBody">
+    <h3><i data-lucide="credit-card" class="icon-inline"></i> Invertir en este proyecto</h3>
     <div class="note" id="investorIdentityNote">Tu sesión determinará automáticamente la cuenta inversionista que realizará la operación.</div>
+    <div class="field">
+      <label>Cuenta bancaria de origen</label>
+      <input type="text" id="investBank" placeholder="Ej. 191-0012345-0-01">
+    </div>
     <div class="field">
       <label>Monto a invertir (S/)</label>
       <input type="number" id="investAmount" min="50" placeholder="1000">
     </div>
+    <div class="note" style="font-size:12px;">
+      Simulación: el monto se cargará a la cuenta indicada, se sumará a tu billetera y se transferirá al agricultor en una sola operación. En producción, una pasarela de pagos procesaría la transferencia real.
+    </div>
     <div class="form-msg" id="investMsg"></div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
-      <button class="btn btn-primary" onclick="submitInvestment()">Confirmar inversión</button>
+      <button class="btn btn-primary" onclick="submitInvestment()">Procesar pago</button>
     </div>
   </div>
 </div>
@@ -212,23 +219,88 @@ async function openModal() {
     const me = await AgerVestAPI.me();
     if (me.role !== 'investor') { window.location.href = me.role === 'farmer' ? 'farmer-dashboard.html' : me.role === 'ally' ? 'ally-dashboard.html' : 'login.html'; return; }
     Session.setInvestor(me.user.id, me.user.name);
-    const note = document.getElementById('investorIdentityNote');
+    const body = document.getElementById('investModalBody');
     const inv = me.user;
-    if (note) note.innerHTML = `<strong>Cuenta:</strong> ${inv.name} · ${inv.email} · <strong>Disponible:</strong> ${fmtMoney(inv.walletBalance)}${inv.verified ? ' · <i data-lucide="check-circle-2" class="icon-inline"></i> Verificación completada' : ' · ⏳ Verificación requerida'}`;
+    const verifiedChip = inv.verified
+      ? '<i data-lucide="check-circle-2" class="icon-inline"></i> Verificación completada'
+      : '<i data-lucide="hourglass" class="icon-inline"></i> Verificación requerida — solicítala desde tu panel';
+    body.innerHTML = `
+      <h3><i data-lucide="credit-card" class="icon-inline"></i> Invertir en este proyecto</h3>
+      <div class="note"><strong>Cuenta:</strong> ${inv.name} · ${inv.email}<br><strong>Disponible en billetera:</strong> ${fmtMoney(inv.walletBalance)} · ${verifiedChip}</div>
+      <div class="field"><label>Cuenta bancaria de origen</label><input type="text" id="investBank" placeholder="Ej. 191-0012345-0-01"></div>
+      <div class="field"><label>Monto a invertir (S/)</label><input type="number" id="investAmount" min="50" placeholder="1000"></div>
+      <div class="note" style="font-size:12px;">Simulación: el monto se cargará a la cuenta indicada, se sumará a tu billetera y se transferirá al agricultor en una sola operación.</div>
+      <div class="form-msg" id="investMsg"></div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="submitInvestment()" ${inv.verified ? '' : 'disabled'}>Procesar pago</button>
+      </div>
+    `;
+    if (window.lucide) window.lucide.createIcons();
     document.getElementById('investModal').classList.add('open');
   } catch (e) { window.location.href = 'login.html'; }
 }
 function closeModal() { document.getElementById('investModal').classList.remove('open'); document.getElementById('investMsg').className = 'form-msg'; }
 async function submitInvestment() {
-  const msg = document.getElementById('investMsg'); const amount = Number(document.getElementById('investAmount').value);
+  const msg = document.getElementById('investMsg');
+  const amount = Number(document.getElementById('investAmount').value);
+  const bank = document.getElementById('investBank').value.trim();
   if (!amount || amount <= 0) { msg.className = 'form-msg err'; msg.textContent = 'Ingresa un monto válido.'; return; }
+  if (bank.length < 5) { msg.className = 'form-msg err'; msg.textContent = 'Ingresa una cuenta bancaria válida.'; return; }
   try {
-    const me = await AgerVestAPI.me(); if (me.role !== 'investor') throw new Error('Debes iniciar sesión como inversionista.');
+    const me = await AgerVestAPI.me();
+    if (me.role !== 'investor') throw new Error('Debes iniciar sesión como inversionista.');
     if (!me.user.verified) {
-      msg.className = 'form-msg err'; msg.innerHTML = `Antes de invertir debes completar la verificación del perfil. <button type="button" class="legal-link" onclick="openVerification()">Completar verificación</button>`; return;
+      msg.className = 'form-msg err';
+      msg.innerHTML = 'Antes de invertir debes solicitar la verificación de tu cuenta desde tu panel.';
+      return;
     }
-    await AgerVestAPI.invest(projectId, amount); msg.className = 'form-msg ok'; msg.textContent = '¡Inversión realizada! El dinero se transfirió a la billetera del agricultor y tu retorno quedó programado.'; setTimeout(() => { closeModal(); load(); }, 1200);
-  } catch (e) { msg.className = 'form-msg err'; msg.textContent = 'Error: ' + e.message; }
+    // Paso 1: simular pago bancario (loader)
+    const body = document.getElementById('investModalBody');
+    body.innerHTML = `
+      <h3><i data-lucide="credit-card" class="icon-inline"></i> Procesando pago</h3>
+      <div class="deposit-spinner" style="display:flex;align-items:center;justify-content:center;gap:12px;padding:30px 0;">
+        <div class="spinner" style="width:28px;height:28px;border:3px solid #e2e8f0;border-top-color:var(--agv-green);border-radius:50%;animation:dspin 0.8s linear infinite;"></div>
+        <div>Debitando ${fmtMoney(amount)} de la cuenta ${bank}…</div>
+      </div>
+    `;
+    if (window.lucide) window.lucide.createIcons();
+    await new Promise(r => setTimeout(r, 1500));
+
+    // Paso 2: depósito real a billetera
+    await API.post('/api/wallet/deposit', { amount, bankAccount: bank });
+
+    body.innerHTML = `
+      <h3><i data-lucide="check-circle-2" class="icon-inline"></i> Confirmando inversión</h3>
+      <div class="deposit-spinner" style="display:flex;align-items:center;justify-content:center;gap:12px;padding:30px 0;">
+        <div class="spinner" style="width:28px;height:28px;border:3px solid #e2e8f0;border-top-color:var(--agv-green);border-radius:50%;animation:dspin 0.8s linear infinite;"></div>
+        <div>Transfiriendo a la billetera del agricultor…</div>
+      </div>
+    `;
+    if (window.lucide) window.lucide.createIcons();
+    await new Promise(r => setTimeout(r, 900));
+
+    // Paso 3: inversión
+    await AgerVestAPI.invest(projectId, amount);
+
+    body.innerHTML = `
+      <div style="text-align:center;padding:16px 0;">
+        <i data-lucide="check-circle-2" style="width:56px;height:56px;color:var(--agv-green);"></i>
+        <h3 style="margin:14px 0 8px;">¡Inversión realizada!</h3>
+        <p style="color:var(--agv-muted);margin:0 0 16px;">Se cargaron <strong>${fmtMoney(amount)}</strong> desde tu cuenta <strong>${bank}</strong> y se transfirieron a la billetera del agricultor. Tu retorno quedó programado.</p>
+        <button class="btn btn-primary" onclick="closeModal();load();">Entendido</button>
+      </div>
+    `;
+    if (window.lucide) window.lucide.createIcons();
+  } catch (e) {
+    const body = document.getElementById('investModalBody');
+    body.innerHTML = `
+      <h3><i data-lucide="alert-triangle" class="icon-inline"></i> No se pudo procesar</h3>
+      <p class="form-msg err" style="margin:12px 0;">${e.message || e}</p>
+      <div class="modal-actions"><button class="btn btn-primary" onclick="closeModal()">Cerrar</button></div>
+    `;
+    if (window.lucide) window.lucide.createIcons();
+  }
 }
 function openVerification(){ document.getElementById('verifyModal').classList.add('open'); }
 function closeVerification(){ document.getElementById('verifyModal').classList.remove('open'); const msg=document.getElementById('verifyMsg'); if(msg){msg.className='form-msg';msg.textContent='';} }

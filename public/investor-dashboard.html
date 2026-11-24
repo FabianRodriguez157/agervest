@@ -14,6 +14,34 @@
 </section>
 
 <footer id="footer"></footer>
+
+<div class="deposit-modal" id="depositModal" onclick="if(event.target===this)closeDepositModal()">
+  <div class="modal-content">
+    <h3><i data-lucide="credit-card" class="icon-inline"></i> Depositar fondos</h3>
+    <p style="color:var(--agv-muted);font-size:13.5px;margin:0 0 16px;">
+      Simulación: usa cualquier número como cuenta bancaria. En producción, una pasarela de pagos (Culqi, MercadoPago, Niubiz) procesaría esta transferencia.
+    </p>
+    <form id="depositForm" onsubmit="submitDeposit(event)">
+      <div class="field" style="margin-bottom:12px;">
+        <label for="depBank">Cuenta bancaria</label>
+        <input type="text" id="depBank" placeholder="Ej. 191-0012345-0-01" required>
+      </div>
+      <div class="field" style="margin-bottom:12px;">
+        <label for="depAmount">Monto a depositar (S/)</label>
+        <input type="number" id="depAmount" min="10" step="10" placeholder="500" required>
+      </div>
+      <div class="form-msg err" id="depositMsg"></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px;">
+        <button type="button" class="btn btn-outline" onclick="closeDepositModal()">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Confirmar depósito</button>
+      </div>
+    </form>
+    <div id="depositSpinner" class="deposit-spinner" style="display:none;">
+      <div class="spinner"></div><div>Procesando transferencia bancaria…</div>
+    </div>
+    <div id="depositSuccess" style="display:none;"></div>
+  </div>
+</div>
 <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
 <script src="js/config.js"></script>
 <script src="js/common.js"></script>
@@ -37,12 +65,16 @@ async function load() {
     const allProjects = await AgerVestAPI.listProjects();
     const { investor, investments, totalInvested, totalExpectedReturn, projectsFunded, pendingReturns, transactions } = data;
     content.innerHTML = `
+    ${verificationBannerHtml(me.user)}
     <div class="dash-header">
       <div class="who">
         <div class="avatar">${initials(investor.name)}</div>
         <div><h1>${investor.name}</h1><div class="sub">${investor.email}</div></div>
       </div>
-      <a href="catalog.html" class="btn btn-primary">+ Nueva inversión</a>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-outline" onclick="openDepositModal()"><i data-lucide="credit-card" class="icon-inline"></i> Depositar fondos</button>
+        <a href="catalog.html" class="btn btn-primary">+ Nueva inversión</a>
+      </div>
     </div>
 
     <div class="kpi-row">
@@ -333,6 +365,52 @@ function initInvestorAnalytics(){
 
 load();
 setTimeout(initInvestorAnalytics, 40);
+
+// --- Depósito simulado ---
+function openDepositModal() {
+  const m = document.getElementById('depositModal');
+  if (!m) return;
+  m.classList.add('open');
+  document.getElementById('depositForm').style.display = '';
+  document.getElementById('depositSpinner').style.display = 'none';
+  document.getElementById('depositSuccess').style.display = 'none';
+  document.getElementById('depositMsg').textContent = '';
+}
+function closeDepositModal() { document.getElementById('depositModal')?.classList.remove('open'); }
+
+async function submitDeposit(e) {
+  e.preventDefault();
+  const amount = Number(document.getElementById('depAmount').value);
+  const bank = document.getElementById('depBank').value.trim();
+  const msg = document.getElementById('depositMsg');
+  msg.textContent = '';
+  if (!amount || amount <= 0) { msg.textContent = 'Monto inválido'; return; }
+  if (bank.length < 5) { msg.textContent = 'Cuenta bancaria inválida'; return; }
+
+  document.getElementById('depositForm').style.display = 'none';
+  document.getElementById('depositSpinner').style.display = '';
+
+  // Simula latencia de pasarela
+  await new Promise(r => setTimeout(r, 1600));
+
+  try {
+    const r = await API.post('/api/wallet/deposit', { amount, bankAccount: bank });
+    document.getElementById('depositSpinner').style.display = 'none';
+    const ok = document.getElementById('depositSuccess');
+    ok.style.display = '';
+    ok.innerHTML = `<div style="text-align:center;padding:10px 0;">
+      <i data-lucide="check-circle-2" style="width:48px;height:48px;color:var(--agv-green);"></i>
+      <h3 style="margin:12px 0 6px;">Depósito confirmado</h3>
+      <p style="color:var(--agv-muted);font-size:14px;">Se abonaron <strong>${fmtMoney(amount)}</strong> a tu billetera.<br>Saldo nuevo: <strong>${fmtMoney(r.newBalance)}</strong></p>
+      <button class="btn btn-primary" style="margin-top:14px;" onclick="closeDepositModal();load();">Entendido</button>
+    </div>`;
+    if (window.lucide) window.lucide.createIcons();
+  } catch (err) {
+    document.getElementById('depositSpinner').style.display = 'none';
+    document.getElementById('depositForm').style.display = '';
+    msg.textContent = 'Error: ' + (err.message || err);
+  }
+}
 </script>
 </body>
 </html>

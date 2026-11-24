@@ -7,6 +7,7 @@ import * as AdminsRepo from '../repositories/admins.repo';
 import { hashPassword, verifyPassword } from '../lib/password';
 import { signToken, UserRole } from '../lib/jwt';
 import { config } from '../lib/config';
+import { callFnOne } from '../lib/db';
 import { authRequired } from '../middleware/auth';
 import { BadRequest, Unauthorized, NotFound } from '../lib/errors';
 
@@ -142,6 +143,13 @@ router.get('/me', authRequired, async (req, res, next) => {
     else if (role === 'ally')     user = await AlliesRepo.findById(sub);
     else if (role === 'admin')    user = await AdminsRepo.findById(sub);
     if (!user) throw NotFound('Usuario no encontrado');
+    // Enriquecer con estado de verificación
+    const vrow = await callFnOne<any>('fn_get_verification_state', [sub]);
+    if (vrow) {
+      user.verified = vrow.verified;
+      user.verificationRequestedAt = vrow.verification_requested_at;
+      user.verificationDecidedAt = vrow.verification_decided_at;
+    }
     res.json({ role, user });
   } catch (e) { next(e); }
 });
@@ -158,6 +166,17 @@ router.post('/investor/verify', authRequired, async (req, res, next) => {
     const data = verifySchema.parse(req.body);
     const investor = await InvestorsRepo.verify(req.auth!.sub, data);
     res.json({ user: investor, verified: true, demo: true });
+  } catch (e) { next(e); }
+});
+
+router.post('/request-verification', authRequired, async (req, res, next) => {
+  try {
+    if (req.auth!.role === 'admin') throw BadRequest('El administrador no requiere verificación');
+    const row = await callFnOne<any>('fn_request_verification', [req.auth!.sub]);
+    res.json({
+      verified: row.verified,
+      verificationRequestedAt: row.verification_requested_at,
+    });
   } catch (e) { next(e); }
 });
 
