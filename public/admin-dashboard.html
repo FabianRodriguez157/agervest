@@ -21,18 +21,38 @@ async function load() {
                     : me.role === 'ally' ? 'ally-dashboard.html' : 'login.html';
       return;
     }
-    const [metrics, farmers, pending] = await Promise.all([
+    const [metrics, farmers, pending, earnings] = await Promise.all([
       API.get('/api/admin/metrics'),
       API.get('/api/admin/farmers'),
       API.get('/api/admin/verifications'),
+      API.get('/api/admin/earnings'),
     ]);
-    render(c, me.user, metrics, farmers, pending);
+    render(c, me.user, metrics, farmers, pending, earnings);
   } catch (e) {
     c.innerHTML = '<div class="empty-state">No se pudo cargar el panel. <a href="login.html">Volver al inicio de sesión</a></div>';
   }
 }
 
-function render(c, admin, m, farmers, pending) {
+function render(c, admin, m, farmers, pending, earnings) {
+  const es = earnings.summary;
+  const earningsRows = earnings.list.length ? earnings.list.map(e => `
+    <tr>
+      <td style="font-size:12px;color:var(--agv-muted);">${new Date(e.createdAt).toLocaleString('es-PE')}</td>
+      <td><div style="font-weight:700;">${e.projectTitle}</div><div style="font-size:12px;color:var(--agv-muted);">${e.projectCrop}</div></td>
+      <td>${e.investorName}</td>
+      <td>${e.farmerName}</td>
+      <td style="text-align:right;">${fmtMoneyLocal(e.grossAmount)}</td>
+      <td style="text-align:right;color:var(--agv-green);font-weight:700;">${fmtMoneyLocal(e.commission)}</td>
+      <td style="text-align:right;">${fmtMoneyLocal(e.netToFarmer)}</td>
+      <td style="text-align:right;font-size:12px;color:var(--agv-muted);">${(e.commissionRate * 100).toFixed(1)}%</td>
+    </tr>`).join('') : '<tr><td colspan="8" style="text-align:center;color:var(--agv-muted);padding:20px;">Sin inversiones registradas todavía. Las comisiones aparecerán aquí cuando un inversionista invierta en un proyecto.</td></tr>';
+  const byProjectRows = earnings.byProject.length ? earnings.byProject.map(p => `
+    <tr>
+      <td><div style="font-weight:700;">${p.projectTitle}</div><div style="font-size:12px;color:var(--agv-muted);">${p.projectCrop}</div></td>
+      <td style="text-align:right;">${p.investmentsCount}</td>
+      <td style="text-align:right;">${fmtMoneyLocal(p.totalGross)}</td>
+      <td style="text-align:right;color:var(--agv-green);font-weight:700;">${fmtMoneyLocal(p.totalCommission)}</td>
+    </tr>`).join('') : '<tr><td colspan="4" style="text-align:center;color:var(--agv-muted);padding:16px;">Sin ingresos por proyecto aún.</td></tr>';
   const roleLabel = { farmer: 'Agricultor', investor: 'Inversionista', ally: 'Aliado' };
   const pendingRows = pending.length ? pending.map(u => `
     <tr>
@@ -79,6 +99,39 @@ function render(c, admin, m, farmers, pending) {
       <div class="card kpi-card"><div class="l">Agricultores validados</div><div class="v">${m.validatedFarmers} <span style="font-size:14px;color:var(--agv-muted);">/ ${m.totalFarmers}</span></div><div class="sub">${m.pendingFarmers} pendientes</div></div>
       <div class="card kpi-card"><div class="l">Proyectos</div><div class="v">${m.totalProjects}</div><div class="sub">${m.activeProjects} activos · ${m.fundedProjects} financiados · ${m.completedProjects} completados</div></div>
       <div class="card kpi-card"><div class="l">Capital movilizado</div><div class="v">${fmtMoneyLocal(m.totalInvested)}</div><div class="sub">en inversiones completadas</div></div>
+    </div>
+
+    <h3 style="margin:28px 0 10px;">Ingresos de AgerVest · comisión ${(es.commissionRate * 100).toFixed(0)}% por inversión</h3>
+    <div class="kpi-row">
+      <div class="card kpi-card" style="background:linear-gradient(135deg,#1a7d2f 0%,#2aa84a 100%);color:#fff;">
+        <div class="l" style="color:rgba(255,255,255,.85);">Total ganado</div>
+        <div class="v" style="color:#fff;">${fmtMoneyLocal(es.totalCommission)}</div>
+        <div class="sub" style="color:rgba(255,255,255,.75);">de ${fmtMoneyLocal(es.totalGross)} movilizados</div>
+      </div>
+      <div class="card kpi-card"><div class="l">Inversiones realizadas</div><div class="v">${es.totalInvestments}</div><div class="sub">cada una genera comisión</div></div>
+      <div class="card kpi-card"><div class="l">Comisión promedio</div><div class="v">${fmtMoneyLocal(es.averageCommission)}</div><div class="sub">por inversión</div></div>
+      <div class="card kpi-card"><div class="l">Pagado a agricultores</div><div class="v">${fmtMoneyLocal(es.totalNetToFarmers)}</div><div class="sub">neto del aporte</div></div>
+    </div>
+
+    <div class="card table-card" style="margin-top:18px;">
+      <h3>Ingresos por proyecto</h3>
+      <table>
+        <thead><tr><th>Proyecto</th><th style="text-align:right;">Inversiones</th><th style="text-align:right;">Capital movilizado</th><th style="text-align:right;">Comisión acumulada</th></tr></thead>
+        <tbody>${byProjectRows}</tbody>
+      </table>
+    </div>
+
+    <div class="card table-card" style="margin-top:18px;">
+      <h3>Detalle: cada inversión y su comisión</h3>
+      <div style="overflow-x:auto;">
+      <table>
+        <thead><tr>
+          <th>Fecha</th><th>Proyecto</th><th>Inversionista</th><th>Agricultor</th>
+          <th style="text-align:right;">Bruto</th><th style="text-align:right;">Comisión (AgerVest)</th><th style="text-align:right;">Neto al agricultor</th><th style="text-align:right;">Tasa</th>
+        </tr></thead>
+        <tbody>${earningsRows}</tbody>
+      </table>
+      </div>
     </div>
 
     <h3 style="margin:28px 0 10px;">Retornos</h3>

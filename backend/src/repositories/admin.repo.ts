@@ -81,3 +81,56 @@ export async function rejectVerification(userId: string, notes?: string) {
   const row = await callFnOne<any>('fn_admin_reject_verification', [userId, notes ?? null]);
   return { id: row.id, verified: row.verified, verificationDecidedAt: row.verification_decided_at };
 }
+
+export interface EarningsSummary {
+  totalInvestments: number;
+  totalGross: number;
+  totalCommission: number;
+  totalNetToFarmers: number;
+  averageCommission: number;
+  commissionRate: number;
+}
+
+export async function earningsSummary(): Promise<EarningsSummary> {
+  const row = await callFnOne<any>('fn_admin_earnings_summary');
+  return {
+    totalInvestments: Number(row?.total_investments ?? 0),
+    totalGross: Number(row?.total_gross ?? 0),
+    totalCommission: Number(row?.total_commission ?? 0),
+    totalNetToFarmers: Number(row?.total_net_to_farmers ?? 0),
+    averageCommission: Number(row?.average_commission ?? 0),
+    commissionRate: Number(row?.commission_rate ?? 0.06),
+  };
+}
+
+export async function earningsList() {
+  const rows = await callFn<any>('fn_admin_earnings_list');
+  return rows.map(r => ({
+    id: r.id,
+    investmentId: r.investment_id,
+    projectId: r.project_id,
+    projectTitle: r.project_title,
+    projectCrop: r.project_crop,
+    investorId: r.investor_id,
+    investorName: r.investor_name,
+    farmerId: r.farmer_id,
+    farmerName: r.farmer_name,
+    grossAmount: Number(r.gross_amount),
+    commission: Number(r.commission),
+    netToFarmer: Number(r.net_to_farmer),
+    commissionRate: Number(r.commission_rate),
+    createdAt: r.created_at,
+  }));
+}
+
+export async function earningsByProject() {
+  const rows = await callFn<any>('fn_admin_earnings_by_project');
+  return rows.map(r => ({
+    projectId: r.project_id,
+    projectTitle: r.project_title,
+    projectCrop: r.project_crop,
+    investmentsCount: Number(r.investments_count),
+    totalGross: Number(r.total_gross),
+    totalCommission: Number(r.total_commission),
+  }));
+}

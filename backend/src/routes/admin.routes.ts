@@ -54,4 +54,15 @@ router.post('/verifications/:userId/reject', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
+router.get('/earnings', async (_req, res, next) => {
+  try {
+    const [summary, list, byProject] = await Promise.all([
+      AdminRepo.earningsSummary(),
+      AdminRepo.earningsList(),
+      AdminRepo.earningsByProject(),
+    ]);
+    res.json({ summary, list, byProject });
+  } catch (e) { next(e); }
+});
+
 export default router;
