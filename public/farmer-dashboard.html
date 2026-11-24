@@ -29,6 +29,7 @@
 </div>
 
 <footer id="footer"></footer>
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
 <script src="js/config.js"></script>
 <script src="js/common.js"></script>
 <script src="js/api-client.js"></script>
@@ -64,13 +65,13 @@ async function loadDashboard() {
     <div class="dash-header">
       <div class="who">
         <div class="avatar">${initials(farmer.name)}</div>
-        <div><h1>${farmer.name}</h1><div class="sub">${farmer.location} · ${farmer.cropType} · ${farmer.areaHa} ha ${farmer.validated ? '· <span style="color:var(--agv-green);font-weight:700;">✅ Validado</span>' : '· ⏳ Pendiente de validación'}</div></div>
+        <div><h1>${farmer.name}</h1><div class="sub">${farmer.location} · ${farmer.cropType} · ${farmer.areaHa} ha ${farmer.validated ? '· <span style="color:var(--agv-green);font-weight:700;"><i data-lucide="check-circle-2" class="icon-inline"></i> Validado</span>' : '· ⏳ Pendiente de validación'}</div></div>
       </div>
       <a href="register-project.html" class="btn btn-primary">+ Publicar nuevo proyecto</a>
     </div>
 
     <div class="kpi-row">
-      <div class="card kpi-card"><div class="l">💰 Saldo billetera</div><div class="v gold">${fmtMoney(walletBalance)}</div></div>
+      <div class="card kpi-card"><div class="l"><i data-lucide="coins" class="icon-inline"></i> Saldo billetera</div><div class="v gold">${fmtMoney(walletBalance)}</div></div>
       <div class="card kpi-card"><div class="l">Financiamiento recibido (histórico)</div><div class="v">${fmtMoney(totalRaised)}</div></div>
       <div class="card kpi-card"><div class="l">Retornos por pagar</div><div class="v">${fmtMoney((pendingObligations || []).reduce((s,o) => s + Number(o.amount), 0))}</div></div>
       <div class="card kpi-card"><div class="l">Proyectos activos</div><div class="v">${activeProjects}</div></div>
@@ -103,7 +104,7 @@ async function loadDashboard() {
           ${transactions.slice(0, 20).map(t => `
             <tr style="border-bottom:1px solid #f3f3f3;">
               <td style="padding:8px 4px;">${fmtDate(t.completedAt || t.scheduledFor || t.createdAt)}</td>
-              <td>${t.type === 'investment' ? '📥 Inversión recibida' : t.type === 'return' ? '📤 Retorno' : t.type}</td>
+              <td>${t.type === 'investment' ? '<i data-lucide="inbox" class="icon-inline"></i> Inversión recibida' : t.type === 'return' ? '<i data-lucide="send" class="icon-inline"></i> Retorno' : t.type}</td>
               <td style="color:#666;">${t.description || '—'}</td>
               <td><span class="status-pill ${t.status}">${t.status}</span></td>
               <td style="text-align:right;color:${t.direction === 'in' ? '#1a7f37' : '#c0392b'};font-weight:600;">${t.direction === 'in' ? '+' : '-'} ${fmtMoney(t.amount)}</td>
@@ -114,20 +115,20 @@ async function loadDashboard() {
 
     <div class="dashboard-insights">
       <div class="insight-card highlight">
-        <div class="insight-head"><h3 class="insight-title">Estado del perfil</h3><span class="insight-icon">🛡️</span></div>
+        <div class="insight-head"><h3 class="insight-title">Estado del perfil</h3><span class="insight-icon"><i data-lucide="shield-check" class="icon-inline"></i></span></div>
         <div class="insight-value">${farmer.validated ? 'Perfil validado' : 'Pendiente de validación'}</div>
         <p class="insight-copy">${farmer.validated ? 'Tu identidad y perfil cuentan con validación en la plataforma.' : 'Completa y mantén actualizada tu documentación para fortalecer la confianza de tu perfil.'}</p>
         <div class="quick-actions"><span class="status-summary ${farmer.validated ? '' : 'pending'}">${farmer.validated ? '● Verificado' : '● En revisión'}</span></div>
       </div>
       <div class="insight-card">
-        <div class="insight-head"><h3 class="insight-title">Financiamiento de proyectos</h3><span class="insight-icon">🌱</span></div>
+        <div class="insight-head"><h3 class="insight-title">Financiamiento de proyectos</h3><span class="insight-icon"><i data-lucide="sprout" class="icon-inline"></i></span></div>
         <div class="insight-value">${projects.length ? Math.round(projects.reduce((s,p) => s + Math.min(100, (p.amountRaised / p.investmentNeeded) * 100), 0) / projects.length) : 0}%</div>
         <p class="insight-copy">Promedio de avance de financiamiento de tus proyectos publicados.</p>
         <div class="dashboard-progress-label"><span>Avance promedio</span><b>${projects.length ? Math.round(projects.reduce((s,p) => s + Math.min(100, (p.amountRaised / p.investmentNeeded) * 100), 0) / projects.length) : 0}%</b></div>
         <div class="progress-bar"><div class="fill" style="width:${projects.length ? Math.round(projects.reduce((s,p) => s + Math.min(100, (p.amountRaised / p.investmentNeeded) * 100), 0) / projects.length) : 0}%"></div></div>
       </div>
       <div class="insight-card">
-        <div class="insight-head"><h3 class="insight-title">Próximo paso</h3><span class="insight-icon">🚀</span></div>
+        <div class="insight-head"><h3 class="insight-title">Próximo paso</h3><span class="insight-icon"><i data-lucide="rocket" class="icon-inline"></i></span></div>
         <div class="insight-value">${projects.length ? 'Mantén actualizado' : 'Publica tu proyecto'}</div>
         <p class="insight-copy">${projects.length ? 'Comparte avances para mantener informados a los potenciales inversionistas.' : 'Presenta tu primer proyecto agrícola para comenzar a recibir interés.'}</p>
         <div class="quick-actions">
@@ -137,9 +138,9 @@ async function loadDashboard() {
     </div>
 
     <div class="dashboard-insights v3-score-guide">
-      <div class="insight-card"><div class="insight-head"><h3 class="insight-title">Qué mejora tu score</h3><span class="insight-icon">📈</span></div><ul class="insight-list"><li>Mantener documentos e información actualizados.</li><li>Cumplir hitos y adjuntar evidencias de avance.</li><li>Registrar resultados de campañas anteriores.</li><li>Contar con validación de parcela y acompañamiento técnico.</li></ul></div>
-      <div class="insight-card"><div class="insight-head"><h3 class="insight-title">Lectura del riesgo</h3><span class="insight-icon">⚠️</span></div><p class="insight-copy">El riesgo del proyecto combina factores productivos, mercado, clima, siniestralidad y costos. Un proyecto con buena gestión aún puede enfrentar riesgos externos.</p></div>
-      <div class="insight-card"><div class="insight-head"><h3 class="insight-title">Datos de referencia</h3><span class="insight-icon">📚</span></div><p class="insight-copy">La analítica agrícola de AgerVest incorpora series de referencia de MIDAGRI, SENAMHI y SAC para contextualizar tus campañas.</p></div>
+      <div class="insight-card"><div class="insight-head"><h3 class="insight-title">Qué mejora tu score</h3><span class="insight-icon"><i data-lucide="trending-up" class="icon-inline"></i></span></div><ul class="insight-list"><li>Mantener documentos e información actualizados.</li><li>Cumplir hitos y adjuntar evidencias de avance.</li><li>Registrar resultados de campañas anteriores.</li><li>Contar con validación de parcela y acompañamiento técnico.</li></ul></div>
+      <div class="insight-card"><div class="insight-head"><h3 class="insight-title">Lectura del riesgo</h3><span class="insight-icon"><i data-lucide="alert-triangle" class="icon-inline"></i></span></div><p class="insight-copy">El riesgo del proyecto combina factores productivos, mercado, clima, siniestralidad y costos. Un proyecto con buena gestión aún puede enfrentar riesgos externos.</p></div>
+      <div class="insight-card"><div class="insight-head"><h3 class="insight-title">Datos de referencia</h3><span class="insight-icon"><i data-lucide="book-open" class="icon-inline"></i></span></div><p class="insight-copy">La analítica agrícola de AgerVest incorpora series de referencia de MIDAGRI, SENAMHI y SAC para contextualizar tus campañas.</p></div>
     </div>
 
     <div class="dashboard-notice">
@@ -168,7 +169,7 @@ async function loadDashboard() {
             <h3 style="margin:0;font-size:15.5px;">${p.title}</h3>
             <span class="status-pill ${p.status}">${statusLabel(p.status)}</span>
           </div>
-          <div class="meta" style="margin:6px 0;font-size:12.5px;color:var(--agv-muted);">🌾 ${p.crop} · ⏱ ${p.durationMonths} meses</div>
+          <div class="meta" style="margin:6px 0;font-size:12.5px;color:var(--agv-muted);"><i data-lucide="wheat" class="icon-inline"></i> ${p.crop} · ⏱ ${p.durationMonths} meses</div>
           <div class="progress-bar"><div class="fill" style="width:${pct}%"></div></div>
           <div class="stats-row" style="margin:6px 0 10px;"><span><b>${fmtMoney(p.amountRaised)}</b> / ${fmtMoney(p.investmentNeeded)}</span><span>Avance cultivo: ${p.progress}%</span></div>
           <div style="display:flex;gap:8px;">

@@ -14,6 +14,7 @@
 </section>
 
 <footer id="footer"></footer>
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
 <script src="js/config.js"></script>
 <script src="js/common.js"></script>
 <script src="js/api-client.js"></script>
@@ -60,20 +61,20 @@ async function load() {
 
     <div class="dashboard-insights">
       <div class="insight-card highlight">
-        <div class="insight-head"><h3 class="insight-title">Perfil de inversión</h3><span class="insight-icon">🎯</span></div>
+        <div class="insight-head"><h3 class="insight-title">Perfil de inversión</h3><span class="insight-icon"><i data-lucide="target" class="icon-inline"></i></span></div>
         <div class="insight-value">${({conservador:'Conservador',moderado:'Moderado',agresivo:'Agresivo'}[investor.riskProfile] || 'Moderado')}</div>
         <p class="insight-copy">Perfil declarado al registrarte. Úsalo como referencia, no como recomendación de inversión.</p>
         <div class="quick-actions"><span class="status-summary">● Perfil registrado</span></div>
       </div>
       <div class="insight-card">
-        <div class="insight-head"><h3 class="insight-title">Capital utilizado</h3><span class="insight-icon">💼</span></div>
+        <div class="insight-head"><h3 class="insight-title">Capital utilizado</h3><span class="insight-icon"><i data-lucide="briefcase" class="icon-inline"></i></span></div>
         <div class="insight-value">${fmtMoney(totalInvested)}</div>
         <p class="insight-copy">Capital invertido actualmente en proyectos de tu portafolio.</p>
         <div class="dashboard-progress-label"><span>Uso del presupuesto declarado</span><b>${investor.investmentBudget ? Math.min(100, Math.round(totalInvested / investor.investmentBudget * 100)) : 0}%</b></div>
         <div class="progress-bar"><div class="fill" style="width:${investor.investmentBudget ? Math.min(100, Math.round(totalInvested / investor.investmentBudget * 100)) : 0}%"></div></div>
       </div>
       <div class="insight-card">
-        <div class="insight-head"><h3 class="insight-title">Diversificación</h3><span class="insight-icon">📊</span></div>
+        <div class="insight-head"><h3 class="insight-title">Diversificación</h3><span class="insight-icon"><i data-lucide="bar-chart-3" class="icon-inline"></i></span></div>
         <div class="insight-value">${projectsFunded} proyecto${projectsFunded === 1 ? '' : 's'}</div>
         <p class="insight-copy">${projectsFunded ? 'Tu portafolio contiene inversiones distribuidas entre oportunidades agrícolas.' : 'Aún no tienes inversiones registradas en tu portafolio.'}</p>
         <div class="quick-actions"><a class="btn btn-ghost btn-sm" href="catalog.html">Explorar oportunidades</a></div>
@@ -81,7 +82,7 @@ async function load() {
     </div>
 
     <div class="dashboard-notice">
-      <span class="notice-icon">⚠️</span>
+      <span class="notice-icon"><i data-lucide="alert-triangle" class="icon-inline"></i></span>
       <div><strong>Recordatorio de riesgo:</strong> los retornos mostrados son estimaciones del prototipo y no están garantizados. Revisa cada proyecto y sus factores de riesgo antes de tomar una decisión. <button type="button" class="legal-link" onclick="openLegalModal('risk')">Ver aviso de riesgos</button></div>
     </div>
 
@@ -111,7 +112,7 @@ async function load() {
           ${transactions.slice(0, 20).map(t => `
             <tr style="border-bottom:1px solid #f3f3f3;">
               <td style="padding:8px 4px;">${fmtDate(t.completedAt || t.scheduledFor || t.createdAt)}</td>
-              <td>${t.type === 'investment' ? '📤 Inversión' : t.type === 'return' ? '📥 Retorno' : t.type}</td>
+              <td>${t.type === 'investment' ? '<i data-lucide="send" class="icon-inline"></i> Inversión' : t.type === 'return' ? '<i data-lucide="inbox" class="icon-inline"></i> Retorno' : t.type}</td>
               <td style="color:#666;">${t.description || '—'}</td>
               <td><span class="status-pill ${t.status}">${t.status}</span></td>
               <td style="text-align:right;color:${t.direction === 'in' ? '#1a7f37' : '#c0392b'};font-weight:600;">${t.direction === 'in' ? '+' : '-'} ${fmtMoney(t.amount)}</td>
@@ -125,7 +126,7 @@ async function load() {
 <div id="investorRegionalAnalytics" style="margin-bottom:22px;"></div>
 <div class="card sim-card" style="margin-bottom:24px;">
       <div class="sim-head">
-        <div><h3 style="margin:0;">🧪 Simulador de portafolio (modo prueba)</h3><p class="sub" style="margin:4px 0 0;">Reparte un presupuesto de prueba entre proyectos y compara riesgo/retorno antes de invertir dinero real.</p></div>
+        <div><h3 style="margin:0;"><i data-lucide="flask-conical" class="icon-inline"></i> Simulador de portafolio (modo prueba)</h3><p class="sub" style="margin:4px 0 0;">Reparte un presupuesto de prueba entre proyectos y compara riesgo/retorno antes de invertir dinero real.</p></div>
       </div>
       <div class="sim-budget-row">
         <div class="field"><label>Presupuesto de prueba (S/)</label><input type="number" id="simBudget" min="100" step="100" value="${investor.investmentBudget || 10000}"></div>
@@ -137,7 +138,7 @@ async function load() {
             <option value="agresivo" ${investor.riskProfile === 'agresivo' ? 'selected' : ''}>Agresivo</option>
           </select>
         </div>
-        <button class="btn btn-dark btn-sm" onclick="autoAllocate()">✨ Generar distribución sugerida</button>
+        <button class="btn btn-dark btn-sm" onclick="autoAllocate()"><i data-lucide="sparkles" class="icon-inline"></i> Generar distribución sugerida</button>
         <button class="btn btn-ghost btn-sm" onclick="resetAllocations()">Reiniciar montos</button>
       </div>
       <div id="simBody"><div class="loading">Cargando proyectos activos…</div></div>
@@ -204,7 +205,7 @@ function renderSimulator() {
     <div class="sim-project-row">
       <div>
         <div class="title">${p.title}</div>
-        <div class="meta">🌾 ${p.crop} · 📍 ${p.location} · <span class="chip risk-${p.computedRisk}" style="position:static;display:inline-block;padding:2px 8px;">${riskLabel(p.computedRisk)} · ${p.riskScorePct}%${p.riskConsistent ? '' : ' ⚠'}</span></div>
+        <div class="meta"><i data-lucide="wheat" class="icon-inline"></i> ${p.crop} · <i data-lucide="map-pin" class="icon-inline"></i> ${p.location} · <span class="chip risk-${p.computedRisk}" style="position:static;display:inline-block;padding:2px 8px;">${riskLabel(p.computedRisk)} · ${p.riskScorePct}%${p.riskConsistent ? '' : ' <i data-lucide="alert-triangle" class="icon-inline"></i>'}</span></div>
       </div>
       <div class="meta">Retorno<br><b style="color:var(--agv-green);font-size:14px;">+${p.expectedReturnPct}%</b></div>
       <div class="meta">Disponible<br><b>${fmtMoney(cap)}</b></div>
@@ -239,13 +240,13 @@ function renderSimulator() {
       <span class="pill medio">Medio: ${totalAllocated ? Math.round(byRisk.medio / totalAllocated * 100) : 0}%</span>
       <span class="pill alto">Alto: ${totalAllocated ? Math.round(byRisk.alto / totalAllocated * 100) : 0}%</span>
     </div>
-    ${over ? '<p style="color:var(--agv-danger);font-size:13px;font-weight:600;">⚠ La distribución supera tu presupuesto de prueba. Ajusta los montos antes de aplicar.</p>' : ''}
+    ${over ? '<p style="color:var(--agv-danger);font-size:13px;font-weight:600;"><i data-lucide="alert-triangle" class="icon-inline"></i> La distribución supera tu presupuesto de prueba. Ajusta los montos antes de aplicar.</p>' : ''}
     <div>${rows}</div>
     <div class="sim-actions">
-      <button class="btn btn-primary" onclick="applySimulation()" ${over || totalAllocated <= 0 ? 'disabled' : ''}>✅ Convertir esta simulación en inversiones reales</button>
+      <button class="btn btn-primary" onclick="applySimulation()" ${over || totalAllocated <= 0 ? 'disabled' : ''}><i data-lucide="check-circle-2" class="icon-inline"></i> Convertir esta simulación en inversiones reales</button>
       <div class="form-msg" id="simMsg"></div>
     </div>
-    <p class="sim-disclaimer">El simulador no descuenta tu saldo real ni crea inversiones hasta que presiones "Convertir en inversiones reales". El riesgo mostrado es el riesgo contrastado por AgerVest (ver ⚠ si difiere del declarado por el agricultor).</p>
+    <p class="sim-disclaimer">El simulador no descuenta tu saldo real ni crea inversiones hasta que presiones "Convertir en inversiones reales". El riesgo mostrado es el riesgo contrastado por AgerVest (ver <i data-lucide="alert-triangle" class="icon-inline"></i> si difiere del declarado por el agricultor).</p>
   `;
 }
 

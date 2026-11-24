@@ -31,7 +31,7 @@
 
 <div class="modal-overlay" id="verifyModal">
   <div class="modal">
-    <h3>🧾 Verificación del inversionista</h3>
+    <h3><i data-lucide="receipt" class="icon-inline"></i> Verificación del inversionista</h3>
     <p>Completa estos datos para simular el envío de tu solicitud de validación antes de una operación.</p>
     <div class="field"><label>DNI / documento</label><input id="verifyDoc" maxlength="12" placeholder="Documento"></div>
     <div class="field"><label>Celular</label><input id="verifyPhone" placeholder="999 999 999"></div>
@@ -43,6 +43,7 @@
 </div>
 
 <footer id="footer"></footer>
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
 <script src="js/config.js"></script>
 <script src="js/common.js"></script>
 <script src="js/api-client.js"></script>
@@ -81,8 +82,8 @@ async function load() {
       <div>
         <img class="detail-hero-img" src="${p.imageUrl}" alt="${p.title}">
         <div class="tag-row">
-          <span class="tag">🌾 ${p.crop}</span>
-          <span class="tag">📍 ${p.location}</span>
+          <span class="tag"><i data-lucide="wheat" class="icon-inline"></i> ${p.crop}</span>
+          <span class="tag"><i data-lucide="map-pin" class="icon-inline"></i> ${p.location}</span>
           <span class="tag">⏱ ${p.durationMonths} meses</span>
           <span class="chip risk-${p.risk}" style="position:static;display:inline-block;">${riskLabel(p.risk)}</span>
         </div>
@@ -92,26 +93,26 @@ async function load() {
           <div class="avatar">${initials(farmer?.name)}</div>
           <div>
             <div style="font-weight:700;">${farmer?.name || 'Agricultor'}</div>
-            <div class="verified">${farmer?.validated ? '✅ Agricultor validado · confianza ' + farmer.trustScore + '/100' : '⏳ Validación pendiente'}</div>
+            <div class="verified">${farmer?.validated ? '<i data-lucide="check-circle-2" class="icon-inline"></i> Agricultor validado · confianza ' + farmer.trustScore + '/100' : '⏳ Validación pendiente'}</div>
           </div>
         </div>
         <p style="font-size:12px;color:var(--agv-muted);margin:-10px 0 20px;">
           Verificación contrastable en <a href="https://sidea.midagri.gob.pe/" target="_blank" rel="noopener" style="color:var(--agv-green);font-weight:700;">SIDEA — MIDAGRI</a> (referencial, simulado en este prototipo).
         </p>
 
-        <div class="project-v3-score-strip"><div><span>👨‍🌾 Productor</span><strong>${farmer?.trustScore ?? 0}/100</strong><small>Solidez operativa observada</small></div><div><span>📉 Riesgo calculado</span><strong>${ra.riskScorePct}%</strong><small>Menor exposición estimada</small></div><div><span>🛡️ Confianza</span><strong>${Math.round(((farmer?.trustScore ?? 0)+(100-ra.riskScorePct)+(farmer?.validated?100:60))/3)}/100</strong><small>Índice referencial</small></div></div>
+        <div class="project-v3-score-strip"><div><span><i data-lucide="wheat" class="icon-inline"></i> Productor</span><strong>${farmer?.trustScore ?? 0}/100</strong><small>Solidez operativa observada</small></div><div><span><i data-lucide="trending-down" class="icon-inline"></i> Riesgo calculado</span><strong>${ra.riskScorePct}%</strong><small>Menor exposición estimada</small></div><div><span><i data-lucide="shield-check" class="icon-inline"></i> Confianza</span><strong>${Math.round(((farmer?.trustScore ?? 0)+(100-ra.riskScorePct)+(farmer?.validated?100:60))/3)}/100</strong><small>Índice referencial</small></div></div>
 
         <div class="info-block"><h4>Descripción del proyecto</h4><p>${p.description}</p></div>
         <div class="info-block"><h4>Objetivos</h4><p>${p.objectives}</p></div>
         <div class="info-block"><h4>Beneficios esperados</h4><p>${p.benefits}</p></div>
 
         <div class="info-block risk-contrast-block ${ra.consistent ? '' : 'inconsistent'}">
-          <h4>🔍 Riesgo contrastado por AgerVest</h4>
+          <h4><i data-lucide="search" class="icon-inline"></i> Riesgo contrastado por AgerVest</h4>
           <div class="risk-contrast-row">
             <div class="risk-contrast-pill"><span class="l">Riesgo declarado</span><span class="chip risk-${ra.declaredRisk}" style="position:static;display:inline-block;">${riskLabel(ra.declaredRisk)}</span></div>
             <div class="risk-contrast-pill"><span class="l">Riesgo calculado</span><span class="chip risk-${ra.computedRisk}" style="position:static;display:inline-block;">${riskLabel(ra.computedRisk)} · ${ra.riskScorePct}%</span></div>
           </div>
-          <p class="risk-contrast-note ${ra.consistent ? 'ok' : 'warn'}">${ra.consistent ? '✅' : '⚠️'} ${ra.note}</p>
+          <p class="risk-contrast-note ${ra.consistent ? 'ok' : 'warn'}">${ra.consistent ? '<i data-lucide="check-circle-2" class="icon-inline"></i>' : '<i data-lucide="alert-triangle" class="icon-inline"></i>'} ${ra.note}</p>
 
           <div class="risk-score-bar">
             <div class="risk-score-fill" style="left:calc(${ra.riskScorePct}% - 1px);"></div>
@@ -142,7 +143,7 @@ async function load() {
         </div>
 
         <div class="info-block season-block">
-          <h4>🌦️ Temporada y clima del cultivo</h4>
+          <h4><i data-lucide="cloud-rain" class="icon-inline"></i> Temporada y clima del cultivo</h4>
           <div class="season-grid">
             <div><span class="l">Ciclo del cultivo</span><span class="v">${si.ciclo}</span></div>
             <div><span class="l">Siembra habitual</span><span class="v">${si.siembra}</span></div>
@@ -196,7 +197,7 @@ async function load() {
         </div>
 
         <button class="btn btn-primary btn-block" onclick="openModal()" ${p.status !== 'active' ? 'disabled' : ''}>
-          ${p.status === 'active' ? '💰 Invertir en este proyecto' : 'Financiamiento cerrado'}
+          ${p.status === 'active' ? '<i data-lucide="coins" class="icon-inline"></i> Invertir en este proyecto' : 'Financiamiento cerrado'}
         </button>
       </div>
     </div>`;
@@ -213,7 +214,7 @@ async function openModal() {
     Session.setInvestor(me.user.id, me.user.name);
     const note = document.getElementById('investorIdentityNote');
     const inv = me.user;
-    if (note) note.innerHTML = `<strong>Cuenta:</strong> ${inv.name} · ${inv.email} · <strong>Disponible:</strong> ${fmtMoney(inv.walletBalance)}${inv.verified ? ' · ✅ Verificación completada' : ' · ⏳ Verificación requerida'}`;
+    if (note) note.innerHTML = `<strong>Cuenta:</strong> ${inv.name} · ${inv.email} · <strong>Disponible:</strong> ${fmtMoney(inv.walletBalance)}${inv.verified ? ' · <i data-lucide="check-circle-2" class="icon-inline"></i> Verificación completada' : ' · ⏳ Verificación requerida'}`;
     document.getElementById('investModal').classList.add('open');
   } catch (e) { window.location.href = 'login.html'; }
 }

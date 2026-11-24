@@ -83,9 +83,10 @@ function renderNavbar(active) {
         ? `<a href="ally-dashboard.html" class="${active === 'ally-dash' ? 'active' : ''}">Panel aliado</a>`
         : '';
   const sessionArea = loggedIn
-    ? `<div class="nav-cta"><a href="${dashHref}" class="btn btn-outline btn-sm">👤 ${Session.name || 'Mi panel'}</a><button class="btn btn-primary btn-sm" onclick="Session.logout()">Salir</button></div>`
+    ? `<div class="nav-cta"><a href="${dashHref}" class="btn btn-outline btn-sm"><i data-lucide="user" class="icon-inline"></i> ${Session.name || 'Mi panel'}</a><button class="btn btn-primary btn-sm" onclick="Session.logout()">Salir</button></div>`
     : `<div class="nav-cta"><a href="login.html" class="btn btn-outline btn-sm">Iniciar sesión</a><a href="register-project.html" class="btn btn-primary btn-sm">Publicar proyecto</a></div>`;
-  el.innerHTML = `<div class="topbar-inner"><a class="brand" href="index.html"><span class="leaf">🌱</span> AgerVest</a><div class="nav-links"><a href="index.html" class="${active === 'home' ? 'active' : ''}">Inicio</a><a href="catalog.html" class="${active === 'catalog' ? 'active' : ''}">Oportunidades</a>${dashboardLink}</div>${sessionArea}</div>`;
+  el.innerHTML = `<div class="topbar-inner"><a class="brand" href="index.html"><img src="img/logo.png" alt="AgerVest" class="brand-logo"> AgerVest</a><div class="nav-links"><a href="index.html" class="${active === 'home' ? 'active' : ''}">Inicio</a><a href="catalog.html" class="${active === 'catalog' ? 'active' : ''}">Oportunidades</a>${dashboardLink}</div>${sessionArea}</div>`;
+  if (window.lucide) window.lucide.createIcons();
 }
 
 function renderFooter() {
@@ -94,7 +95,16 @@ function renderFooter() {
   el.innerHTML = `<div class="container footer-enhanced"><div>© ${new Date().getFullYear()} AgerVest — Financia historias que alimentan al país.</div><div class="footer-links"><button type="button" class="footer-legal-link" onclick="openLegalModal('terms')">Términos</button><button type="button" class="footer-legal-link" onclick="openLegalModal('privacy')">Privacidad</button><button type="button" class="footer-legal-link" onclick="openLegalModal('risk')">Aviso de riesgos</button><span>Prototipo académico · UCSM Ing. de Sistemas</span></div></div>`;
 }
 
-document.addEventListener('DOMContentLoaded', () => renderFooter());
+function renderIcons() { if (window.lucide) window.lucide.createIcons(); }
+document.addEventListener('DOMContentLoaded', () => {
+  renderFooter();
+  renderIcons();
+  // Auto-render icons when dynamic content is injected
+  const obs = new MutationObserver(() => {
+    if (document.querySelector('[data-lucide]')) renderIcons();
+  });
+  obs.observe(document.body, { childList: true, subtree: true });
+});
 
 
 // ---------- Legal information (registration prototype) ----------

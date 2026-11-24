@@ -12,12 +12,12 @@
 <section class="section">
   <div class="container form-wrap">
     <div class="card form-card">
-      <h1 class="form-title">🧑‍🌾 Registro de agricultor</h1>
+      <h1 class="form-title"><i data-lucide="user" class="icon-inline"></i>‍<i data-lucide="wheat" class="icon-inline"></i> Registro de agricultor</h1>
       <p class="form-sub">Completa tus datos para validar tu perfil productivo y poder publicar proyectos en AgerVest.</p>
       <div class="step-indicator"><div class="step-dot done"></div><div class="step-dot done"></div><div class="step-dot"></div></div>
 
       <div class="legal-intro">
-        <div class="legal-icon">⚖</div>
+        <div class="legal-icon"><i data-lucide="scale" class="icon-inline"></i></div>
         <div>
           <strong>Información legal y protección de tus datos</strong>
           <p>Antes de crear tu cuenta, revisa las condiciones de uso, la política de privacidad y la información sobre el tratamiento de tus datos.</p>
@@ -31,7 +31,7 @@
       <form id="farmerForm">
         <!-- SECCIÓN 1: Datos Personales -->
         <div class="form-section">
-          <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;">👤 Datos Personales</h3>
+          <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;"><i data-lucide="user" class="icon-inline"></i> Datos Personales</h3>
           <div class="field-row">
             <div class="field"><label>Nombre completo *</label><input type="text" name="name" required placeholder="Ej. Rosa Quispe Mamani"></div>
             <div class="field"><label>Teléfono de contacto *</label><input type="tel" name="phone" required placeholder="+51987654321"></div>
@@ -44,7 +44,7 @@
 
         <!-- SECCIÓN 2: Seguridad -->
         <div class="form-section">
-          <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;">🔒 Seguridad</h3>
+          <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;"><i data-lucide="lock" class="icon-inline"></i> Seguridad</h3>
           <div class="field">
             <label>Contraseña *</label>
             <input type="password" name="password" id="farmerPassword" required minlength="8" placeholder="••••••••" title="Mín. 8 caracteres, 1 mayúscula, 1 número">
@@ -58,7 +58,7 @@
 
         <!-- SECCIÓN 3: Identificación y Documentos -->
         <div class="form-section">
-          <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;">📋 Identificación</h3>
+          <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;"><i data-lucide="clipboard-list" class="icon-inline"></i> Identificación</h3>
           <div class="field-row">
             <div class="field"><label>Documento de identidad (DNI/RUC) *</label><input type="text" name="documentId" required placeholder="12345678"></div>
             <div class="field">
@@ -76,7 +76,7 @@
           <div class="field">
             <label>Documentación de validación (título, certificados) *</label>
             <div class="upload-box" onclick="document.getElementById('docFile').click()">
-              📎 Haz clic para adjuntar archivo
+              <i data-lucide="paperclip" class="icon-inline"></i> Haz clic para adjuntar archivo
               <input type="file" id="docFile" style="display:none" onchange="document.getElementById('fileName').textContent = this.files[0]?.name || ''">
             </div>
             <small class="hint" id="fileName"></small>
@@ -85,7 +85,7 @@
 
         <!-- SECCIÓN 4: Información Agrícola -->
         <div class="form-section">
-          <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;">🌱 Información Agrícola</h3>
+          <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;"><i data-lucide="sprout" class="icon-inline"></i> Información Agrícola</h3>
           <div class="field-row">
             <div class="field">
               <label>Tipo de cultivo principal *</label>
@@ -117,7 +117,7 @@
 
         <!-- SECCIÓN 5: Información de Pago -->
         <div class="form-section">
-          <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;">💳 Información de Pago</h3>
+          <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;"><i data-lucide="credit-card" class="icon-inline"></i> Información de Pago</h3>
           <div class="field-row">
             <div class="field">
               <label>Método de pago preferido *</label>
@@ -134,7 +134,7 @@
 
         <!-- SECCIÓN 6: Términos y Condiciones -->
         <div class="form-section">
-          <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;">✓ Acuerdos</h3>
+          <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;"><i data-lucide="check" class="icon-inline"></i> Acuerdos</h3>
           <div class="legal-consent">
             <div class="checkbox-field">
               <input type="checkbox" id="farmerTerms" name="termsAccepted" required>
@@ -153,7 +153,7 @@
       </form>
 
       <div class="info-block" style="margin-top:8px;border-top:1px solid var(--agv-border);padding-top:16px;">
-        <h4>🔒 Confianza y verificación</h4>
+        <h4><i data-lucide="lock" class="icon-inline"></i> Confianza y verificación</h4>
         <p style="font-size:13px;">Para reforzar la confianza de los inversionistas, tu perfil puede contrastarse con el
         <a href="https://sidea.midagri.gob.pe/" target="_blank" rel="noopener" style="color:var(--agv-green);font-weight:700;">Sistema de Información para el Desarrollo Agrario (SIDEA) del MIDAGRI</a>,
         fuente oficial del Estado peruano. <em>Enlace referencial — integración simulada en este prototipo.</em></p>
@@ -165,6 +165,7 @@
 </section>
 
 <footer id="footer"></footer>
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
 <script src="js/config.js"></script>
 <script src="js/common.js"></script>
 <script>

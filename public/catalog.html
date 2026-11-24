@@ -39,6 +39,7 @@
 </section>
 
 <footer id="footer"></footer>
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
 <script src="js/config.js"></script>
 <script src="js/common.js"></script>
 <script src="js/agervest-v4-data.js"></script>
@@ -81,7 +82,7 @@ function cardHtml(p) {
     </div>
     <div class="body">
       <h3>${p.title}</h3>
-      <div class="meta"><span>📍 ${p.location}</span><span>🌾 ${p.crop}</span><span>⏱ ${p.durationMonths} meses</span></div><div class="meta"><span>👨‍🌾 Productor ${p.producerScore ?? "—"}/100</span><span>📊 Riesgo ${p.riskScorePct !== undefined ? p.riskScorePct+"%" : "—"}</span><span>🛡️ Confianza ${p.confidenceIndex ?? "—"}/100</span></div>
+      <div class="meta"><span><i data-lucide="map-pin" class="icon-inline"></i> ${p.location}</span><span><i data-lucide="wheat" class="icon-inline"></i> ${p.crop}</span><span>⏱ ${p.durationMonths} meses</span></div><div class="meta"><span><i data-lucide="wheat" class="icon-inline"></i> Productor ${p.producerScore ?? "—"}/100</span><span><i data-lucide="bar-chart-3" class="icon-inline"></i> Riesgo ${p.riskScorePct !== undefined ? p.riskScorePct+"%" : "—"}</span><span><i data-lucide="shield-check" class="icon-inline"></i> Confianza ${p.confidenceIndex ?? "—"}/100</span></div>
       <div class="progress-bar"><div class="fill" style="width:${pct}%"></div></div>
       <div class="stats-row">
         <span><b>${fmtMoney(p.amountRaised)}</b> de ${fmtMoney(p.investmentNeeded)} · ${pct}%</span>

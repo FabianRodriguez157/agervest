@@ -12,13 +12,13 @@
 <section class="section">
   <div class="container form-wrap">
     <div class="card form-card">
-      <h1 class="form-title">🌾 Registrar proyecto agrícola</h1>
+      <h1 class="form-title"><i data-lucide="wheat" class="icon-inline"></i> Registrar proyecto agrícola</h1>
       <p class="form-sub">Describe tu cultivo, la inversión requerida y los beneficios esperados para publicarlo en el catálogo.</p>
 
       <form id="projectForm">
         <!-- SECCIÓN 1: Información Básica del Proyecto -->
         <div class="form-section">
-          <h3 style="border-bottom:2px solid var(--agv-gold);padding-bottom:8px;margin-bottom:16px;">📋 Información Básica</h3>
+          <h3 style="border-bottom:2px solid var(--agv-gold);padding-bottom:8px;margin-bottom:16px;"><i data-lucide="clipboard-list" class="icon-inline"></i> Información Básica</h3>
           <div class="field">
             <label>Título del proyecto *</label>
             <input type="text" name="title" required placeholder="Ej. Ampliación de cultivo de quinua orgánica — Cosecha 2024" maxlength="100">
@@ -45,7 +45,7 @@
 
         <!-- SECCIÓN 2: Descripción y Detalles -->
         <div class="form-section">
-          <h3 style="border-bottom:2px solid var(--agv-gold);padding-bottom:8px;margin-bottom:16px;">📝 Descripción del Proyecto</h3>
+          <h3 style="border-bottom:2px solid var(--agv-gold);padding-bottom:8px;margin-bottom:16px;"><i data-lucide="file-text" class="icon-inline"></i> Descripción del Proyecto</h3>
           <div class="field">
             <label>Descripción general del proyecto *</label>
             <textarea name="description" required placeholder="Describe el proyecto en detalle: estado actual del cultivo, área afectada, plan de trabajo, tecnología a usar, etc." maxlength="1000" rows="5"></textarea>
@@ -65,7 +65,7 @@
 
         <!-- SECCIÓN 3: Financiero -->
         <div class="form-section">
-          <h3 style="border-bottom:2px solid var(--agv-gold);padding-bottom:8px;margin-bottom:16px;">💰 Información Financiera</h3>
+          <h3 style="border-bottom:2px solid var(--agv-gold);padding-bottom:8px;margin-bottom:16px;"><i data-lucide="coins" class="icon-inline"></i> Información Financiera</h3>
           <div class="field-row">
             <div class="field">
               <label>Inversión total requerida (S/) *</label>
@@ -95,9 +95,9 @@
               <label>Nivel de riesgo estimado *</label>
               <select name="risk" required>
                 <option value="">Selecciona…</option>
-                <option value="bajo">🟢 Bajo — cultivo probado, condiciones óptimas</option>
-                <option value="medio" selected>🟡 Medio — factores de riesgo moderados</option>
-                <option value="alto">🔴 Alto — nuevas técnicas o condiciones adversas</option>
+                <option value="bajo"><i data-lucide="circle-dot" class="icon-inline"></i> Bajo — cultivo probado, condiciones óptimas</option>
+                <option value="medio" selected><i data-lucide="circle" class="icon-inline"></i> Medio — factores de riesgo moderados</option>
+                <option value="alto"><i data-lucide="circle-off" class="icon-inline"></i> Alto — nuevas técnicas o condiciones adversas</option>
               </select>
             </div>
             <div class="field">
@@ -115,7 +115,7 @@
 
         <!-- SECCIÓN 4: Objetivos y Beneficios -->
         <div class="form-section">
-          <h3 style="border-bottom:2px solid var(--agv-gold);padding-bottom:8px;margin-bottom:16px;">🎯 Objetivos y Beneficios</h3>
+          <h3 style="border-bottom:2px solid var(--agv-gold);padding-bottom:8px;margin-bottom:16px;"><i data-lucide="target" class="icon-inline"></i> Objetivos y Beneficios</h3>
           <div class="field">
             <label>Objetivos específicos del proyecto *</label>
             <textarea name="objectives" required placeholder="¿Qué se espera lograr con la inversión? Ej: Incrementar rendimiento 20%, expandir área cultivada, implementar riego goteo, etc." maxlength="800" rows="4"></textarea>
@@ -130,7 +130,7 @@
 
         <!-- SECCIÓN 5: Gestión de Riesgos -->
         <div class="form-section">
-          <h3 style="border-bottom:2px solid var(--agv-gold);padding-bottom:8px;margin-bottom:16px;">⚠️ Análisis de Riesgos</h3>
+          <h3 style="border-bottom:2px solid var(--agv-gold);padding-bottom:8px;margin-bottom:16px;"><i data-lucide="alert-triangle" class="icon-inline"></i> Análisis de Riesgos</h3>
           <div class="field">
             <label>Posibles riesgos y mitigaciones *</label>
             <textarea name="riskMitigation" required placeholder="Ej: Riesgo climático → sistema de riego. Plagas → control integrado. Mercado → contratos previos con compradores." maxlength="600" rows="4"></textarea>
@@ -160,7 +160,7 @@
 
         <!-- SECCIÓN 6: Validaciones y Documentos -->
         <div class="form-section">
-          <h3 style="border-bottom:2px solid var(--agv-gold);padding-bottom:8px;margin-bottom:16px;">📦 Validación y Documentos</h3>
+          <h3 style="border-bottom:2px solid var(--agv-gold);padding-bottom:8px;margin-bottom:16px;"><i data-lucide="package" class="icon-inline"></i> Validación y Documentos</h3>
           <div class="field-row">
             <div class="field">
               <label>Certificación agrícola *</label>
@@ -188,7 +188,7 @@
           <div class="field">
             <label>Documentos de respaldo (simulado)</label>
             <div class="upload-box" onclick="document.getElementById('docFile').click()">
-              📎 Adjunta: plano de terreno, planes de siembra, análisis de suelo, contratos, etc.
+              <i data-lucide="paperclip" class="icon-inline"></i> Adjunta: plano de terreno, planes de siembra, análisis de suelo, contratos, etc.
               <input type="file" id="docFile" style="display:none" onchange="document.getElementById('docName').textContent = this.files[0]?.name || ''">
             </div>
             <small class="hint" id="docName">Documentos opcionales que fortalecen tu proyecto</small>
@@ -197,11 +197,11 @@
 
         <!-- SECCIÓN 7: Imagen y Multimedia -->
         <div class="form-section">
-          <h3 style="border-bottom:2px solid var(--agv-gold);padding-bottom:8px;margin-bottom:16px;">📸 Multimedia</h3>
+          <h3 style="border-bottom:2px solid var(--agv-gold);padding-bottom:8px;margin-bottom:16px;"><i data-lucide="camera" class="icon-inline"></i> Multimedia</h3>
           <div class="field">
             <label>Foto del cultivo o terreno</label>
             <div class="upload-box" onclick="document.getElementById('imgFile').click()">
-              🖼️ Haz clic para adjuntar una foto actual del cultivo/terreno
+              <i data-lucide="image" class="icon-inline"></i> Haz clic para adjuntar una foto actual del cultivo/terreno
               <input type="file" id="imgFile" style="display:none" onchange="document.getElementById('imgName').textContent = this.files[0]?.name || ''">
             </div>
             <small class="hint" id="imgName">Imágenes recientes ayudan a generar confianza</small>
@@ -210,7 +210,7 @@
 
         <!-- SECCIÓN 8: Términos -->
         <div class="form-section">
-          <h3 style="border-bottom:2px solid var(--agv-gold);padding-bottom:8px;margin-bottom:16px;">✓ Acuerdos</h3>
+          <h3 style="border-bottom:2px solid var(--agv-gold);padding-bottom:8px;margin-bottom:16px;"><i data-lucide="check" class="icon-inline"></i> Acuerdos</h3>
           <div class="checkbox-field">
             <input type="checkbox" id="projectTerms" name="projectTermsAccepted" required>
             <label for="projectTerms">Certifíco que la información proporcionada es veraz y asumo responsabilidad legal por ella *</label>
@@ -233,6 +233,7 @@
 </section>
 
 <footer id="footer"></footer>
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
 <script src="js/config.js"></script>
 <script src="js/common.js"></script>
 <script>

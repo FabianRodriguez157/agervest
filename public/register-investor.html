@@ -12,12 +12,12 @@
 <section class="section">
   <div class="container form-wrap">
     <div class="card form-card">
-      <h1 class="form-title">💰 Registro de inversionista</h1>
+      <h1 class="form-title"><i data-lucide="coins" class="icon-inline"></i> Registro de inversionista</h1>
       <p class="form-sub">Crea tu cuenta para invertir en proyectos agrícolas verificados y dar seguimiento a tu portafolio.</p>
       <div class="step-indicator"><div class="step-dot done"></div><div class="step-dot done"></div><div class="step-dot"></div></div>
 
       <div class="legal-intro">
-        <div class="legal-icon">⚖</div>
+        <div class="legal-icon"><i data-lucide="scale" class="icon-inline"></i></div>
         <div>
           <strong>Información legal, privacidad y riesgos</strong>
           <p>La decisión de inversión debe basarse en la información disponible y en tu propia evaluación. Lee los documentos antes de registrarte.</p>
@@ -31,7 +31,7 @@
       <form id="investorForm">
         <!-- SECCIÓN 1: Datos Personales -->
         <div class="form-section">
-          <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;">👤 Datos Personales</h3>
+          <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;"><i data-lucide="user" class="icon-inline"></i> Datos Personales</h3>
           <div class="field-row">
             <div class="field"><label>Nombre completo *</label><input type="text" name="name" required placeholder="Ej. Daniela Fernández"></div>
             <div class="field"><label>Teléfono de contacto *</label><input type="tel" name="phone" required placeholder="+51987654321"></div>
@@ -57,7 +57,7 @@
 
         <!-- SECCIÓN 2: Seguridad -->
         <div class="form-section">
-          <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;">🔒 Seguridad</h3>
+          <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;"><i data-lucide="lock" class="icon-inline"></i> Seguridad</h3>
           <div class="field">
             <label>Contraseña *</label>
             <input type="password" name="password" id="invPassword" required minlength="8" placeholder="••••••••" title="Mín. 8 caracteres, 1 mayúscula, 1 número">
@@ -71,7 +71,7 @@
 
         <!-- SECCIÓN 3: Identificación -->
         <div class="form-section">
-          <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;">📋 Identificación</h3>
+          <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;"><i data-lucide="clipboard-list" class="icon-inline"></i> Identificación</h3>
           <div class="field-row">
             <div class="field">
               <label>Tipo de documento *</label>
@@ -89,7 +89,7 @@
 
         <!-- SECCIÓN 4: Experiencia e Inversión -->
         <div class="form-section">
-          <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;">📊 Experiencia en Inversiones</h3>
+          <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;"><i data-lucide="bar-chart-3" class="icon-inline"></i> Experiencia en Inversiones</h3>
           <div class="field-row">
             <div class="field">
               <label>Experiencia en inversiones *</label>
@@ -128,7 +128,7 @@
 
         <!-- SECCIÓN 5: Información de Pago -->
         <div class="form-section">
-          <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;">💳 Información de Pago</h3>
+          <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;"><i data-lucide="credit-card" class="icon-inline"></i> Información de Pago</h3>
           <div class="field-row">
             <div class="field">
               <label>Método de pago preferido *</label>
@@ -145,7 +145,7 @@
 
         <!-- SECCIÓN 6: Términos y Condiciones -->
         <div class="form-section">
-          <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;">✓ Acuerdos</h3>
+          <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;"><i data-lucide="check" class="icon-inline"></i> Acuerdos</h3>
           <div class="legal-consent">
             <div class="checkbox-field">
               <input type="checkbox" id="invTerms" name="termsAccepted" required>
@@ -173,6 +173,7 @@
 </section>
 
 <footer id="footer"></footer>
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
 <script src="js/config.js"></script>
 <script src="js/common.js"></script>
 <script>
