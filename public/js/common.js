@@ -109,7 +109,15 @@ function renderFooter() {
   el.innerHTML = `<div class="container footer-enhanced"><div>© ${new Date().getFullYear()} AgerVest — Financia historias que alimentan al país.</div><div class="footer-links"><button type="button" class="footer-legal-link" onclick="openLegalModal('terms')">Términos</button><button type="button" class="footer-legal-link" onclick="openLegalModal('privacy')">Privacidad</button><button type="button" class="footer-legal-link" onclick="openLegalModal('risk')">Aviso de riesgos</button><span>Prototipo académico · UCSM Ing. de Sistemas</span></div></div>`;
 }
 
-function renderIcons() { if (window.lucide) window.lucide.createIcons(); }
+let _iconRaf = 0;
+function renderIcons() {
+  if (!window.lucide) return;
+  if (_iconRaf) return;
+  _iconRaf = requestAnimationFrame(() => {
+    _iconRaf = 0;
+    if (document.querySelector('[data-lucide]')) window.lucide.createIcons();
+  });
+}
 
 function verificationBannerHtml(user) {
   if (!user || user.verified) return '';
@@ -138,11 +146,6 @@ async function requestVerification(btn) {
 document.addEventListener('DOMContentLoaded', () => {
   renderFooter();
   renderIcons();
-  // Auto-render icons when dynamic content is injected
-  const obs = new MutationObserver(() => {
-    if (document.querySelector('[data-lucide]')) renderIcons();
-  });
-  obs.observe(document.body, { childList: true, subtree: true });
 });
 
 
