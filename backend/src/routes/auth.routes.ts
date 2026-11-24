@@ -3,6 +3,7 @@ import { z } from 'zod';
 import * as FarmersRepo from '../repositories/farmers.repo';
 import * as InvestorsRepo from '../repositories/investors.repo';
 import * as AlliesRepo from '../repositories/allies.repo';
+import * as AdminsRepo from '../repositories/admins.repo';
 import { hashPassword, verifyPassword } from '../lib/password';
 import { signToken, UserRole } from '../lib/jwt';
 import { config } from '../lib/config';
@@ -106,7 +107,7 @@ router.post('/register-ally', async (req, res, next) => {
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(1),
-  role: z.enum(['farmer', 'investor', 'ally']),
+  role: z.enum(['farmer', 'investor', 'ally', 'admin']),
 });
 
 router.post('/login', async (req, res, next) => {
@@ -115,14 +116,15 @@ router.post('/login', async (req, res, next) => {
     let user: any;
     if (role === 'farmer')        user = await FarmersRepo.findByEmail(email);
     else if (role === 'investor') user = await InvestorsRepo.findByEmail(email);
-    else                           user = await AlliesRepo.findByEmail(email);
+    else if (role === 'ally')     user = await AlliesRepo.findByEmail(email);
+    else                           user = await AdminsRepo.findByEmail(email);
     if (!user) throw Unauthorized('Credenciales inválidas');
     const ok = await verifyPassword(password, user.passwordHash);
     if (!ok) throw Unauthorized('Credenciales inválidas');
     const { passwordHash: _, ...safe } = user;
     const token = signToken({ sub: user.id, role: role as UserRole, name: user.name });
     setAuthCookie(res, token);
-    res.json({ user: safe, token });
+    res.json({ role, user: safe, token });
   } catch (e) { next(e); }
 });
 
@@ -138,6 +140,7 @@ router.get('/me', authRequired, async (req, res, next) => {
     if (role === 'farmer')        user = await FarmersRepo.findById(sub);
     else if (role === 'investor') user = await InvestorsRepo.findById(sub);
     else if (role === 'ally')     user = await AlliesRepo.findById(sub);
+    else if (role === 'admin')    user = await AdminsRepo.findById(sub);
     if (!user) throw NotFound('Usuario no encontrado');
     res.json({ role, user });
   } catch (e) { next(e); }

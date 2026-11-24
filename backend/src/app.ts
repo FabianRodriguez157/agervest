@@ -16,6 +16,7 @@ import investmentsRoutes from './routes/investments.routes';
 import alliesRoutes from './routes/allies.routes';
 import statsRoutes from './routes/stats.routes';
 import walletRoutes from './routes/wallet.routes';
+import adminRoutes from './routes/admin.routes';
 
 export function buildApp() {
   const app = express();
@@ -41,14 +42,16 @@ export function buildApp() {
   app.use('/api/investments', investmentsRoutes);
   app.use('/api/allies', alliesRoutes);
   app.use('/api/wallet', walletRoutes);
+  app.use('/api/admin', adminRoutes);
 
   // Serve legacy static frontend if present (public/ en la raíz del proyecto)
   const publicDir = path.join(__dirname, '..', '..', 'public');
   if (fs.existsSync(publicDir)) {
-    const protectedPages: Record<string, 'farmer'|'investor'|'ally'> = {
+    const protectedPages: Record<string, 'farmer'|'investor'|'ally'|'admin'> = {
       '/farmer-dashboard.html':   'farmer',
       '/investor-dashboard.html': 'investor',
       '/ally-dashboard.html':     'ally',
+      '/admin-dashboard.html':    'admin',
     };
     app.use((req, res, next) => {
       const needs = protectedPages[req.path];

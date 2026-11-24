@@ -19,6 +19,7 @@
         <button type="button" class="active" data-role="farmer"><i data-lucide="user" class="icon-inline"></i>‍<i data-lucide="wheat" class="icon-inline"></i> Soy agricultor</button>
         <button type="button" data-role="investor"><i data-lucide="coins" class="icon-inline"></i> Soy inversionista</button>
         <button type="button" data-role="ally"><i data-lucide="handshake" class="icon-inline"></i> Soy aliado</button>
+        <button type="button" data-role="admin"><i data-lucide="shield-check" class="icon-inline"></i> Administrador</button>
       </div>
 
       <form id="loginForm">
@@ -69,12 +70,17 @@ document.querySelectorAll('#roleSwitch button').forEach(btn => {
     if (selectedRole === 'farmer') {
       link.href = 'register-farmer.html';
       link.textContent = 'Regístrate como agricultor';
+      link.style.display = '';
     } else if (selectedRole === 'investor') {
       link.href = 'register-investor.html';
       link.textContent = 'Regístrate como inversionista';
-    } else {
+      link.style.display = '';
+    } else if (selectedRole === 'ally') {
       link.href = 'register-ally.html';
       link.textContent = 'Regístrate como aliado / asociación';
+      link.style.display = '';
+    } else {
+      link.style.display = 'none';
     }
   });
 });
@@ -103,21 +109,20 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     const data = await API.post('/api/auth/login', {
       email, password, role: selectedRole, rememberMe,
     });
+    msg.className = 'form-msg ok';
+    msg.textContent = `Bienvenido, ${data.user.name}. Redirigiendo…`;
     if (data.role === 'farmer') {
       Session.setFarmer(data.user.id, data.user.name);
-      msg.className = 'form-msg ok';
-      msg.textContent = `Bienvenido, ${data.user.name}. Redirigiendo…`;
       setTimeout(() => { window.location.href = 'farmer-dashboard.html'; }, 900);
     } else if (data.role === 'investor') {
       Session.setInvestor(data.user.id, data.user.name);
-      msg.className = 'form-msg ok';
-      msg.textContent = `Bienvenido, ${data.user.name}. Redirigiendo…`;
       setTimeout(() => { window.location.href = 'investor-dashboard.html'; }, 900);
-    } else {
+    } else if (data.role === 'ally') {
       Session.setAlly(data.user.id, data.user.name);
-      msg.className = 'form-msg ok';
-      msg.textContent = `Bienvenido, ${data.user.name}. Redirigiendo…`;
       setTimeout(() => { window.location.href = 'ally-dashboard.html'; }, 900);
+    } else {
+      Session.setAdmin(data.user.id, data.user.name);
+      setTimeout(() => { window.location.href = 'admin-dashboard.html'; }, 900);
     }
   } catch (err) {
     msg.className = 'form-msg err';

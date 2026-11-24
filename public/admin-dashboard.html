@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Panel de administrador — AgerVest</title><link rel="stylesheet" href="css/styles.css"></head>
+<body><nav class="topbar" id="navbar"></nav>
+<section class="section"><div class="container" id="content"><div class="loading">Cargando panel…</div></div></section>
+<footer id="footer"></footer>
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/common.js"></script>
+<script>
+renderNavbar('admin-dash');
+
+function fmtMoneyLocal(n) { return 'S/ ' + Number(n || 0).toLocaleString('es-PE', { maximumFractionDigits: 0 }); }
+
+async function load() {
+  const c = document.getElementById('content');
+  try {
+    const me = await API.get('/api/auth/me');
+    if (me.role !== 'admin') {
+      location.href = me.role === 'farmer' ? 'farmer-dashboard.html'
+                    : me.role === 'investor' ? 'investor-dashboard.html'
+                    : me.role === 'ally' ? 'ally-dashboard.html' : 'login.html';
+      return;
+    }
+    const [metrics, farmers] = await Promise.all([
+      API.get('/api/admin/metrics'),
+      API.get('/api/admin/farmers'),
+    ]);
+    render(c, me.user, metrics, farmers);
+  } catch (e) {
+    c.innerHTML = '<div class="empty-state">No se pudo cargar el panel. <a href="login.html">Volver al inicio de sesión</a></div>';
+  }
+}
+
+function render(c, admin, m, farmers) {
+  const rows = farmers.map(f => `
+    <tr>
+      <td><div style="font-weight:700;">${f.name}</div><div style="font-size:12px;color:var(--agv-muted);">${f.email}</div></td>
+      <td>${f.cropType || '—'}</td>
+      <td>${f.location || '—'}</td>
+      <td>${f.yearsExperience ?? '—'} años</td>
+      <td>${f.projectsCount}</td>
+      <td>${fmtMoneyLocal(f.walletBalance)}</td>
+      <td>${f.trustScore ?? 0}/100</td>
+      <td>${f.validated
+        ? '<span class="status-pill active"><i data-lucide="check-circle-2" class="icon-inline"></i> Validado</span>'
+        : '<span class="status-pill draft">Pendiente</span>'}</td>
+      <td style="white-space:nowrap;">
+        <button class="btn btn-sm ${f.validated ? 'btn-outline' : 'btn-primary'}" onclick="toggleValidation('${f.id}', ${!f.validated})">
+          ${f.validated ? 'Revocar' : 'Validar'}
+        </button>
+      </td>
+    </tr>`).join('');
+
+  c.innerHTML = `
+    <div class="dash-header">
+      <div class="who">
+        <div class="avatar"><i data-lucide="shield-check" class="icon-md"></i></div>
+        <div><h1>${admin.name}</h1><div class="sub">Administrador · ${admin.email}</div></div>
+      </div>
+    </div>
+
+    <h3 style="margin:18px 0 10px;">Métricas globales</h3>
+    <div class="kpi-row">
+      <div class="card kpi-card"><div class="l">Usuarios</div><div class="v">${m.totalUsers}</div><div class="sub">${m.totalFarmers} agricultores · ${m.totalInvestors} inversionistas · ${m.totalAllies} aliados</div></div>
+      <div class="card kpi-card"><div class="l">Agricultores validados</div><div class="v">${m.validatedFarmers} <span style="font-size:14px;color:var(--agv-muted);">/ ${m.totalFarmers}</span></div><div class="sub">${m.pendingFarmers} pendientes</div></div>
+      <div class="card kpi-card"><div class="l">Proyectos</div><div class="v">${m.totalProjects}</div><div class="sub">${m.activeProjects} activos · ${m.fundedProjects} financiados · ${m.completedProjects} completados</div></div>
+      <div class="card kpi-card"><div class="l">Capital movilizado</div><div class="v">${fmtMoneyLocal(m.totalInvested)}</div><div class="sub">en inversiones completadas</div></div>
+    </div>
+
+    <h3 style="margin:28px 0 10px;">Retornos</h3>
+    <div class="kpi-row">
+      <div class="card kpi-card"><div class="l">Retornos pagados</div><div class="v">${fmtMoneyLocal(m.totalReturnsPaid)}</div></div>
+      <div class="card kpi-card"><div class="l">Retornos pendientes</div><div class="v">${fmtMoneyLocal(m.totalReturnsPending)}</div></div>
+      <div class="card kpi-card"><div class="l">Retornos vencidos</div><div class="v" style="color:${m.overdueReturns > 0 ? 'var(--agv-danger, #c0392b)' : 'inherit'};">${m.overdueReturns}</div><div class="sub">obligaciones con scheduled_for &lt; hoy</div></div>
+      <div class="card kpi-card"><div class="l">Cobertura</div><div class="v">${m.totalInvested > 0 ? Math.round((m.totalReturnsPaid / m.totalInvested) * 100) : 0}%</div><div class="sub">pagado / invertido</div></div>
+    </div>
+
+    <div class="card table-card" style="margin-top:28px;">
+      <h3>Agricultores</h3>
+      <table>
+        <thead><tr>
+          <th>Agricultor</th><th>Cultivo</th><th>Ubicación</th><th>Experiencia</th>
+          <th>Proyectos</th><th>Billetera</th><th>Trust score</th><th>Estado</th><th></th>
+        </tr></thead>
+        <tbody id="farmersBody">${rows}</tbody>
+      </table>
+    </div>
+  `;
+  if (window.lucide) window.lucide.createIcons();
+}
+
+async function toggleValidation(id, validated) {
+  try {
+    await API.post(`/api/admin/farmers/${id}/validate`, { validated });
+    load();
+  } catch (e) {
+    alert('Error: ' + (e.message || e));
+  }
+}
+
+load();
+</script>
+</body></html>

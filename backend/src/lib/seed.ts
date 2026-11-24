@@ -3,6 +3,7 @@ import { hashPassword } from './password';
 import * as FarmersRepo from '../repositories/farmers.repo';
 import * as InvestorsRepo from '../repositories/investors.repo';
 import * as AlliesRepo from '../repositories/allies.repo';
+import * as AdminsRepo from '../repositories/admins.repo';
 import * as ProjectsRepo from '../repositories/projects.repo';
 import * as ProjectsService from '../services/projects.service';
 import * as InvestmentsService from '../services/investments.service';
@@ -11,9 +12,19 @@ import * as StatsRepo from '../repositories/stats.repo';
 async function run() {
   console.log('Seeding AgerVest DB...');
 
+  // Admin bootstrap (idempotente) — se crea aunque el resto ya exista
+  const existingAdmin = await AdminsRepo.findByEmail('admin@agervest.pe');
+  if (!existingAdmin) {
+    const adminHash = await hashPassword('admin123');
+    await AdminsRepo.create({ email: 'admin@agervest.pe', passwordHash: adminHash, name: 'Administrador AgerVest', phone: '900000000' });
+    console.log('  Admin creado: admin@agervest.pe / admin123');
+  } else {
+    console.log('  Admin ya existe, saltando');
+  }
+
   const existing = await StatsRepo.getUsersCount();
-  if (existing > 0) {
-    console.log(`Ya existen ${existing} usuarios — abortando seed (usa npm run db:reset primero)`);
+  if (existing > 1) {
+    console.log(`Ya existen ${existing} usuarios — saltando seed de demo (usa npm run db:reset para recrear datos)`);
     await closePool();
     return;
   }
@@ -86,6 +97,7 @@ async function run() {
   console.log('  Agricultores: 4 (contraseña: demo123)');
   console.log('  Inversionistas: 2 (contraseña: demo123)');
   console.log('  Aliado: 1 — aliado@agervest.pe / Demo1234');
+  console.log('  Admin: 1 — admin@agervest.pe / admin123');
   console.log('  Proyectos: 5 (3 destacados, 1 cerrado con retorno pagado)');
   console.log('  Billeteras: dinero real movido inversor → agricultor en cada inversión');
 

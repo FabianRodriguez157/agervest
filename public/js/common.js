@@ -56,10 +56,19 @@ const Session = {
     localStorage.setItem('agv_role', 'ally');
     if (name) localStorage.setItem('agv_name', name);
   },
+  setAdmin(id, name) {
+    localStorage.removeItem('agv_investor_id');
+    localStorage.removeItem('agv_farmer_id');
+    localStorage.removeItem('agv_ally_id');
+    localStorage.setItem('agv_admin_id', id);
+    localStorage.setItem('agv_role', 'admin');
+    if (name) localStorage.setItem('agv_name', name);
+  },
   clearLocal() {
     localStorage.removeItem('agv_investor_id');
     localStorage.removeItem('agv_farmer_id');
     localStorage.removeItem('agv_ally_id');
+    localStorage.removeItem('agv_admin_id');
     localStorage.removeItem('agv_role');
     localStorage.removeItem('agv_name');
   },
@@ -73,15 +82,20 @@ const Session = {
 function renderNavbar(active) {
   const el = document.getElementById('navbar');
   if (!el) return;
-  const loggedIn = ['farmer', 'investor', 'ally'].includes(Session.role);
-  const dashHref = Session.role === 'farmer' ? 'farmer-dashboard.html' : Session.role === 'investor' ? 'investor-dashboard.html' : 'ally-dashboard.html';
+  const loggedIn = ['farmer', 'investor', 'ally', 'admin'].includes(Session.role);
+  const dashHref = Session.role === 'farmer' ? 'farmer-dashboard.html'
+                 : Session.role === 'investor' ? 'investor-dashboard.html'
+                 : Session.role === 'ally' ? 'ally-dashboard.html'
+                 : 'admin-dashboard.html';
   const dashboardLink = Session.role === 'farmer'
     ? `<a href="farmer-dashboard.html" class="${active === 'farmer-dash' ? 'active' : ''}">Panel agricultor</a>`
     : Session.role === 'investor'
       ? `<a href="investor-dashboard.html" class="${active === 'investor-dash' ? 'active' : ''}">Panel inversionista</a>`
       : Session.role === 'ally'
         ? `<a href="ally-dashboard.html" class="${active === 'ally-dash' ? 'active' : ''}">Panel aliado</a>`
-        : '';
+        : Session.role === 'admin'
+          ? `<a href="admin-dashboard.html" class="${active === 'admin-dash' ? 'active' : ''}">Panel admin</a>`
+          : '';
   const sessionArea = loggedIn
     ? `<div class="nav-cta"><a href="${dashHref}" class="btn btn-outline btn-sm"><i data-lucide="user" class="icon-inline"></i> ${Session.name || 'Mi panel'}</a><button class="btn btn-primary btn-sm" onclick="Session.logout()">Salir</button></div>`
     : `<div class="nav-cta"><a href="login.html" class="btn btn-outline btn-sm">Iniciar sesión</a><a href="register-project.html" class="btn btn-primary btn-sm">Publicar proyecto</a></div>`;
