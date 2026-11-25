@@ -14,7 +14,6 @@
     <div class="card form-card">
       <h1 class="form-title"><i data-lucide="user" class="icon-inline"></i>‍<i data-lucide="wheat" class="icon-inline"></i> Registro de agricultor</h1>
       <p class="form-sub">Completa tus datos para validar tu perfil productivo y poder publicar proyectos en AgerVest.</p>
-      <div class="step-indicator"><div class="step-dot done"></div><div class="step-dot done"></div><div class="step-dot"></div></div>
 
       <div class="legal-intro">
         <div class="legal-icon"><i data-lucide="scale" class="icon-inline"></i></div>
@@ -115,20 +114,14 @@
           </div>
         </div>
 
-        <!-- SECCIÓN 5: Información de Pago -->
+        <!-- SECCIÓN 5: Cuenta bancaria para recibir el financiamiento -->
         <div class="form-section">
-          <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;"><i data-lucide="credit-card" class="icon-inline"></i> Información de Pago</h3>
-          <div class="field-row">
-            <div class="field">
-              <label>Método de pago preferido *</label>
-              <select name="paymentMethod" required>
-                <option value="">Selecciona…</option>
-                <option value="bank_transfer">Transferencia bancaria</option>
-                <option value="wallet">Billetera digital</option>
-                <option value="other">Otro</option>
-              </select>
-            </div>
-            <div class="field"><label>Número de cuenta bancaria *</label><input type="text" name="bankAccount" required placeholder="Ej. 00000123456789"></div>
+          <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;"><i data-lucide="credit-card" class="icon-inline"></i> Cuenta bancaria</h3>
+          <p class="form-sub" style="margin:-6px 0 14px;">AgerVest no maneja dinero físico. El financiamiento se te enviará por <strong>transferencia bancaria</strong> a la cuenta que registres.</p>
+          <input type="hidden" name="paymentMethod" value="bank_transfer">
+          <div class="field">
+            <label>Número de cuenta bancaria o CCI *</label>
+            <input type="text" name="bankAccount" required placeholder="Ej. 00212300123456789012">
           </div>
         </div>
 
@@ -170,6 +163,7 @@
 <script src="js/common.js"></script>
 <script>
 renderNavbar('reg-farmer');
+bindCountryPhonePrefix('select[name="country"]', 'input[name="phone"]');
 
 const pwdInput = document.getElementById('farmerPassword');
 pwdInput?.addEventListener('input', (e) => {

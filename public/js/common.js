@@ -103,6 +103,37 @@ function renderNavbar(active) {
   if (window.lucide) window.lucide.createIcons();
 }
 
+// Prefijos telefónicos por país ISO-2
+const COUNTRY_DIAL_CODES = {
+  PE: '+51', MX: '+52', CO: '+57', CL: '+56', AR: '+54',
+  BO: '+591', EC: '+593', VE: '+58', UY: '+598', PY: '+595',
+  BR: '+55', US: '+1', ES: '+34', OTHER: '',
+};
+
+function bindCountryPhonePrefix(countrySelector, phoneSelector) {
+  const country = document.querySelector(countrySelector);
+  const phone = document.querySelector(phoneSelector);
+  if (!country || !phone) return;
+  let currentPrefix = '';
+  function apply() {
+    const code = COUNTRY_DIAL_CODES[country.value] ?? '';
+    // Quita el prefijo anterior si estaba intacto
+    if (currentPrefix && phone.value.startsWith(currentPrefix)) {
+      phone.value = phone.value.slice(currentPrefix.length).replace(/^\s+/, '');
+    }
+    currentPrefix = code;
+    if (code) {
+      phone.value = (code + ' ' + phone.value).trim();
+      phone.setAttribute('data-prefix', code);
+    } else {
+      phone.removeAttribute('data-prefix');
+    }
+  }
+  country.addEventListener('change', apply);
+  // Si el country ya trae un valor seleccionado al cargar, aplicar
+  if (country.value) apply();
+}
+
 function renderFooter() {
   const el = document.getElementById('footer');
   if (!el) return;

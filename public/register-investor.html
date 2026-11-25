@@ -14,8 +14,6 @@
     <div class="card form-card">
       <h1 class="form-title"><i data-lucide="coins" class="icon-inline"></i> Registro de inversionista</h1>
       <p class="form-sub">Crea tu cuenta para invertir en proyectos agrícolas verificados y dar seguimiento a tu portafolio.</p>
-      <div class="step-indicator"><div class="step-dot done"></div><div class="step-dot done"></div><div class="step-dot"></div></div>
-
       <div class="legal-intro">
         <div class="legal-icon"><i data-lucide="scale" class="icon-inline"></i></div>
         <div>
@@ -126,24 +124,9 @@
           </div>
         </div>
 
-        <!-- SECCIÓN 5: Información de Pago -->
-        <div class="form-section">
-          <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;"><i data-lucide="credit-card" class="icon-inline"></i> Información de Pago</h3>
-          <div class="field-row">
-            <div class="field">
-              <label>Método de pago preferido *</label>
-              <select name="paymentMethod" required>
-                <option value="">Selecciona…</option>
-                <option value="bank_transfer">Transferencia bancaria</option>
-                <option value="wallet">Billetera digital</option>
-                <option value="credit_card">Tarjeta de crédito</option>
-              </select>
-            </div>
-            <div class="field"><label>Número de cuenta bancaria *</label><input type="text" name="bankAccount" required placeholder="Ej. 00000123456789"></div>
-          </div>
-        </div>
+        <!-- Los datos de pago se piden solo al momento de depositar fondos — AgerVest no maneja dinero físico. -->
 
-        <!-- SECCIÓN 6: Términos y Condiciones -->
+        <!-- SECCIÓN 5: Términos y Condiciones -->
         <div class="form-section">
           <h3 style="border-bottom:2px solid var(--agv-green);padding-bottom:8px;margin-bottom:16px;"><i data-lucide="check" class="icon-inline"></i> Acuerdos</h3>
           <div class="legal-consent">
@@ -178,6 +161,7 @@
 <script src="js/common.js"></script>
 <script>
 renderNavbar('reg-investor');
+bindCountryPhonePrefix('select[name="country"]', 'input[name="phone"]');
 
 const invPwdInput = document.getElementById('invPassword');
 invPwdInput?.addEventListener('input', (e) => {
@@ -218,8 +202,7 @@ document.getElementById('investorForm').addEventListener('submit', async (e) => 
     investmentExperience: fd.get('investmentExperience'),
     investmentFrequency: fd.get('investmentFrequency'),
     investmentBudget: Number(fd.get('investmentBudget')),
-    riskProfile: fd.get('riskProfile'), bankAccount: fd.get('bankAccount'),
-    paymentMethod: fd.get('paymentMethod'),
+    riskProfile: fd.get('riskProfile'),
     termsAccepted: Boolean(document.getElementById('invTerms')?.checked),
     dataPolicyAccepted: Boolean(document.getElementById('invDataPolicy')?.checked),
     riskAcknowledgment: Boolean(document.getElementById('invRiskAck')?.checked),
