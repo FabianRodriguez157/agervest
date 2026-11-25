@@ -221,9 +221,7 @@ async function openModal() {
     Session.setInvestor(me.user.id, me.user.name);
     const body = document.getElementById('investModalBody');
     const inv = me.user;
-    const verifiedChip = inv.verified
-      ? '<i data-lucide="check-circle-2" class="icon-inline"></i> Verificación completada'
-      : '<i data-lucide="hourglass" class="icon-inline"></i> Verificación requerida — solicítala desde tu panel';
+    const verifiedChip = verificationBadgeHtml(inv);
     body.innerHTML = `
       <h3><i data-lucide="credit-card" class="icon-inline"></i> Invertir en este proyecto</h3>
       <div class="note"><strong>Cuenta:</strong> ${inv.name} · ${inv.email}<br><strong>Disponible en billetera:</strong> ${fmtMoney(inv.walletBalance)} · ${verifiedChip}</div>

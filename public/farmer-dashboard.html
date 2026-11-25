@@ -63,12 +63,13 @@ async function loadDashboard() {
   content.innerHTML = '<div class="loading">Cargando panel…</div>';
   try {
     const { farmer, projects, totalRaised, activeProjects, walletBalance, pendingObligations, transactions } = await AgerVestAPI.getFarmerDashboard(currentFarmerId);
+    const vStatus = getVerificationStatus(currentMe || farmer);
     content.innerHTML = `
     ${verificationBannerHtml(currentMe || farmer)}
     <div class="dash-header">
       <div class="who">
         <div class="avatar">${initials(farmer.name)}</div>
-        <div><h1>${farmer.name}</h1><div class="sub">${farmer.location} · ${farmer.cropType} · ${farmer.areaHa} ha ${farmer.validated ? '· <span style="color:var(--agv-green);font-weight:700;"><i data-lucide="check-circle-2" class="icon-inline"></i> Validado</span>' : '· <i data-lucide="hourglass" class="icon-inline"></i> Pendiente de validación'}</div></div>
+        <div><h1>${farmer.name}</h1><div class="sub">${farmer.location} · ${farmer.cropType} · ${farmer.areaHa} ha · ${verificationBadgeHtml(currentMe || farmer)}</div></div>
       </div>
       <a href="register-project.html" class="btn btn-primary">+ Publicar nuevo proyecto</a>
     </div>
@@ -119,9 +120,9 @@ async function loadDashboard() {
     <div class="dashboard-insights">
       <div class="insight-card highlight">
         <div class="insight-head"><h3 class="insight-title">Estado del perfil</h3><span class="insight-icon"><i data-lucide="shield-check" class="icon-inline"></i></span></div>
-        <div class="insight-value">${farmer.validated ? 'Perfil validado' : 'Pendiente de validación'}</div>
-        <p class="insight-copy">${farmer.validated ? 'Tu identidad y perfil cuentan con validación en la plataforma.' : 'Completa y mantén actualizada tu documentación para fortalecer la confianza de tu perfil.'}</p>
-        <div class="quick-actions"><span class="status-summary ${farmer.validated ? '' : 'pending'}">${farmer.validated ? '● Verificado' : '● En revisión'}</span></div>
+        <div class="insight-value">${vStatus.label}</div>
+        <p class="insight-copy">${vStatus.description}</p>
+        <div class="quick-actions"><span class="status-summary ${vStatus.pillClass}">● ${vStatus.label}</span></div>
       </div>
       <div class="insight-card">
         <div class="insight-head"><h3 class="insight-title">Financiamiento de proyectos</h3><span class="insight-icon"><i data-lucide="sprout" class="icon-inline"></i></span></div>
@@ -182,6 +183,7 @@ async function loadDashboard() {
         </div>`;
       }).join('');
     }
+    renderIcons();
   } catch (e) {
     content.innerHTML = '<div class="empty-state">No se pudo cargar el panel.</div>';
   }

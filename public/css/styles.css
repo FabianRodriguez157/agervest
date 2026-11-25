@@ -488,6 +488,10 @@ footer .container { display: flex; justify-content: space-between; flex-wrap: wr
   background: #fdf3e9;
   color: #93690f;
 }
+.status-summary.unverified {
+  background: #fbe7e5;
+  color: var(--agv-danger);
+}
 
 /* ---- Registration legal information ---- */
 .legal-intro {

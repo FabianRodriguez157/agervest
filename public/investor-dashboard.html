@@ -88,7 +88,7 @@ async function load() {
       <div class="card kpi-card"><div class="l">Proyectos disponibles</div><div class="v">${allProjects.length}</div></div>
       <div class="card kpi-card"><div class="l">Confianza promedio</div><div class="v">${allProjects.length ? Math.round(allProjects.reduce((a,p)=>a+(p.confidenceIndex || 0),0)/allProjects.length) : 0}/100</div></div>
       <div class="card kpi-card"><div class="l">Región de referencia</div><div class="v">Arequipa</div></div>
-      <div class="card kpi-card"><div class="l">Estado de cuenta</div><div class="v">${investor.verified ? 'Verificada' : 'Pendiente'}</div></div>
+      <div class="card kpi-card"><div class="l">Estado de cuenta</div><div class="v" style="margin-top:8px;">${verificationBadgeHtml(me.user)}</div></div>
     </div>
 
     <div class="dashboard-insights">
@@ -200,6 +200,7 @@ async function load() {
       const n = document.createElement('div'); n.className = 'note'; n.style.marginBottom = '18px'; n.id = 'verifyProfileBtn'; n.innerHTML = '<strong>Verificación pendiente:</strong> completa tu verificación antes de realizar aportes. <a href="catalog.html" class="legal-link">Ir al catálogo para comenzar</a>'; content.insertBefore(n, content.querySelector('.dashboard-section-title'));
     }
     loadSimulator();
+    renderIcons();
   } catch (e) {
     content.innerHTML = '<div class="empty-state">No se pudo cargar el panel. <a href="investor-dashboard.html">Crear nuevo perfil</a></div>';
   }

@@ -164,6 +164,39 @@ function renderIcons() {
   });
 }
 
+function getVerificationStatus(user) {
+  if (user && user.verified) {
+    return {
+      key: 'verified',
+      label: 'Validado',
+      pillClass: 'verified',
+      icon: 'check-circle-2',
+      description: 'Tu identidad y perfil cuentan con validación en la plataforma.',
+    };
+  }
+  if (user && user.verificationRequestedAt) {
+    return {
+      key: 'pending',
+      label: 'Validación pendiente',
+      pillClass: 'pending',
+      icon: 'hourglass',
+      description: 'Tu solicitud está en revisión por un administrador. Pronto validaremos tu cuenta.',
+    };
+  }
+  return {
+    key: 'unverified',
+    label: 'No validado',
+    pillClass: 'unverified',
+    icon: 'alert-circle',
+    description: 'Solicita la verificación desde el banner superior para validar tu cuenta y operar.',
+  };
+}
+
+function verificationBadgeHtml(user) {
+  const st = getVerificationStatus(user);
+  return `<span class="status-summary ${st.pillClass}"><i data-lucide="${st.icon}" class="icon-inline"></i> ${st.label}</span>`;
+}
+
 function verificationBannerHtml(user) {
   if (!user || user.verified) return '';
   const requested = !!user.verificationRequestedAt;
