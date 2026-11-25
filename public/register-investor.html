@@ -209,7 +209,9 @@ document.getElementById('investorForm').addEventListener('submit', async (e) => 
   };
 
   try {
-    const investor = await API.post('/api/auth/register-investor', payload);
+    const res = await API.post('/api/auth/register-investor', payload);
+    const investor = res.user || res;
+    if (res.token) Session.setToken(res.token);
     Session.setInvestor(investor.id, investor.name);
     msg.className = 'form-msg ok';
     msg.textContent = `¡Cuenta creada! Bienvenido, ${investor.name}. Redirigiendo…`;

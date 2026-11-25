@@ -204,17 +204,18 @@ document.getElementById('farmerForm').addEventListener('submit', async (e) => {
     certifications: String(fd.get('certifications')).split(',').filter(x => x.trim()),
     agriculturalCertified: fd.get('agriculturalCertified') === 'true',
     bankAccount: fd.get('bankAccount'), paymentMethod: fd.get('paymentMethod'),
-    documentUrl: document.getElementById('docFile').files[0]?.name,
     termsAccepted: Boolean(document.getElementById('farmerTerms')?.checked),
     dataPolicyAccepted: Boolean(document.getElementById('farmerDataPolicy')?.checked),
   };
 
   try {
-    const farmer = await API.post('/api/auth/register-farmer', payload);
+    const res = await API.post('/api/auth/register-farmer', payload);
+    const farmer = res.user || res;
+    if (res.token) Session.setToken(res.token);
     Session.setFarmer(farmer.id, farmer.name);
     msg.className = 'form-msg ok';
     msg.textContent = `¡Registro exitoso! Perfil creado para ${farmer.name}. Redirigiendo…`;
-    setTimeout(() => { window.location.href = 'register-project.html'; }, 1200);
+    setTimeout(() => { window.location.href = 'farmer-dashboard.html'; }, 1200);
   } catch (err) {
     msg.className = 'form-msg err';
     msg.textContent = 'Error: ' + err.message;

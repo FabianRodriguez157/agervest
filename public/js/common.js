@@ -7,15 +7,24 @@ function _agvUrl(path) {
 function _agvCreds() {
   return (window.AGV_CONFIG && window.AGV_CONFIG.apiBase) ? 'include' : 'same-origin';
 }
+function _agvHeaders(extra = {}) {
+  const token = localStorage.getItem('agv_token');
+  return token ? { ...extra, Authorization: 'Bearer ' + token } : extra;
+}
 const API = {
   async get(url) {
-    const r = await fetch(_agvUrl(url), { credentials: _agvCreds() });
+    const r = await fetch(_agvUrl(url), { credentials: _agvCreds(), headers: _agvHeaders() });
     const data = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(data.error || 'Error de red');
     return data;
   },
   async post(url, body) {
-    const r = await fetch(_agvUrl(url), { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: _agvCreds(), body: JSON.stringify(body) });
+    const r = await fetch(_agvUrl(url), {
+      method: 'POST',
+      headers: _agvHeaders({ 'Content-Type': 'application/json' }),
+      credentials: _agvCreds(),
+      body: JSON.stringify(body),
+    });
     const data = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(data.error || 'Error de red');
     return data;
@@ -35,6 +44,10 @@ const Session = {
   get allyId() { return localStorage.getItem('agv_ally_id'); },
   get role() { return localStorage.getItem('agv_role'); },
   get name() { return localStorage.getItem('agv_name'); },
+  get token() { return localStorage.getItem('agv_token'); },
+  setToken(token) {
+    if (token) localStorage.setItem('agv_token', token);
+  },
   setInvestor(id, name) {
     localStorage.removeItem('agv_farmer_id');
     localStorage.removeItem('agv_ally_id');
@@ -71,6 +84,7 @@ const Session = {
     localStorage.removeItem('agv_admin_id');
     localStorage.removeItem('agv_role');
     localStorage.removeItem('agv_name');
+    localStorage.removeItem('agv_token');
   },
   async logout() {
     try { await API.post('/api/auth/logout', {}); } catch (_) {}

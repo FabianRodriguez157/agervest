@@ -291,8 +291,6 @@ document.getElementById('projectForm').addEventListener('submit', async (e) => {
     priorExperience: fd.get('priorExperience'),
     certification: fd.get('certification'),
     technicalSupport: fd.get('technicalSupport'),
-    imageUrl: document.getElementById('imgFile').files[0]?.name,
-    documentUrl: document.getElementById('docFile').files[0]?.name,
     termsAccepted: Boolean(document.getElementById('projectTerms')?.checked),
     updatesAccepted: Boolean(document.getElementById('projectUpdates')?.checked),
   };

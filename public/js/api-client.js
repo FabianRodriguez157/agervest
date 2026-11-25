@@ -12,10 +12,13 @@
 
   async function request(method, path, body) {
     const prefix = (global.AGV_CONFIG && global.AGV_CONFIG.apiBase) || '';
+    const token = global.localStorage && localStorage.getItem('agv_token');
+    const headers = { 'Accept': 'application/json' };
+    if (token) headers['Authorization'] = 'Bearer ' + token;
     const opts = {
       method,
       credentials: prefix ? 'include' : 'same-origin',
-      headers: { 'Accept': 'application/json' },
+      headers,
     };
     if (body !== undefined && body !== null) {
       opts.headers['Content-Type'] = 'application/json';

@@ -57,6 +57,7 @@ router.post('/deposit', authRequired, async (req, res, next) => {
   try {
     const { amount, bankAccount } = depositSchema.parse(req.body);
     const row = await callFnOne<any>('fn_wallet_deposit', [req.auth!.sub, amount, bankAccount]);
+    if (!row) throw BadRequest('No se pudo procesar el depósito');
     res.json({ transactionId: row.tx_id, newBalance: Number(row.new_balance) });
   } catch (e) { next(e); }
 });

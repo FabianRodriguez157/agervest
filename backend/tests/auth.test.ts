@@ -43,4 +43,12 @@ describe('auth', () => {
     const res = await request(app).get('/api/auth/me');
     expect(res.status).toBe(401);
   });
+
+  it('permite solicitar verificación con sesión activa', async () => {
+    const { agent } = await loginAs('farmer', email, password);
+    const res = await agent.post('/api/auth/request-verification').send({});
+    expect(res.status).toBe(200);
+    expect(res.body.verified).toBe(false);
+    expect(res.body.verificationRequestedAt).toBeTruthy();
+  });
 });

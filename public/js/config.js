@@ -12,6 +12,8 @@
  *   Asegúrate de que la variable CORS_ORIGINS del backend incluya el dominio
  *   https://<usuario>.github.io para que las cookies de sesión viajen.
  */
+const _isGithubPages = typeof window !== 'undefined' && window.location.hostname.endsWith('github.io');
+
 window.AGV_CONFIG = window.AGV_CONFIG || {
-  apiBase: '',
+  apiBase: _isGithubPages ? 'https://agervest-api.onrender.com' : '',
 };

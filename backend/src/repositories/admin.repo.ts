@@ -1,4 +1,5 @@
 import { callFn, callFnOne } from '../lib/db';
+import { NotFound } from '../lib/errors';
 
 export interface AdminMetrics {
   totalUsers: number;
@@ -74,11 +75,13 @@ export async function listPendingVerifications() {
 
 export async function approveVerification(userId: string, notes?: string) {
   const row = await callFnOne<any>('fn_admin_approve_verification', [userId, notes ?? null]);
+  if (!row) throw NotFound('Usuario no encontrado');
   return { id: row.id, verified: row.verified, verificationDecidedAt: row.verification_decided_at };
 }
 
 export async function rejectVerification(userId: string, notes?: string) {
   const row = await callFnOne<any>('fn_admin_reject_verification', [userId, notes ?? null]);
+  if (!row) throw NotFound('Usuario no encontrado');
   return { id: row.id, verified: row.verified, verificationDecidedAt: row.verification_decided_at };
 }
 

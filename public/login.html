@@ -109,6 +109,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     const data = await API.post('/api/auth/login', {
       email, password, role: selectedRole, rememberMe,
     });
+    if (data.token) Session.setToken(data.token);
     msg.className = 'form-msg ok';
     msg.textContent = `Bienvenido, ${data.user.name}. Redirigiendo…`;
     if (data.role === 'farmer') {

@@ -173,6 +173,7 @@ router.post('/request-verification', authRequired, async (req, res, next) => {
   try {
     if (req.auth!.role === 'admin') throw BadRequest('El administrador no requiere verificación');
     const row = await callFnOne<any>('fn_request_verification', [req.auth!.sub]);
+    if (!row) throw NotFound('Usuario no encontrado');
     res.json({
       verified: row.verified,
       verificationRequestedAt: row.verification_requested_at,
