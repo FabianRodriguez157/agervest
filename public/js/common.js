@@ -35,7 +35,10 @@ function fmtMoney(n) { return 'S/ ' + Number(n || 0).toLocaleString('es-PE', { m
 function fmtDate(d) { return new Date(d).toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' }); }
 function initials(name) { return (name || '?').split(' ').filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase(); }
 function riskLabel(r) { return { bajo: 'Riesgo bajo', medio: 'Riesgo medio', alto: 'Riesgo alto' }[r] || r; }
-function statusLabel(s) { return { active: 'Activo', funded: 'Financiado', in_progress: 'En curso', completed: 'Completado', draft: 'Borrador' }[s] || s; }
+function statusLabel(s) { return { active: 'Captando fondos', funded: 'Financiado y desembolsado', in_progress: 'En curso', completed: 'Completado', draft: 'Borrador', cancelled: 'No alcanzó la meta (reembolsado)' }[s] || s; }
+function investmentStatusLabel(s) { return { reserved: 'Reservado (esperando meta)', active: 'Desembolsado · pago programado', refunded: 'Reembolsado' }[s] || s || '—'; }
+function newIdempotencyKey() { return (crypto.randomUUID ? crypto.randomUUID() : (Date.now() + '-' + Math.random().toString(36).slice(2))); }
+function daysLeft(d) { if (!d) return null; return Math.ceil((new Date(d) - Date.now()) / 86400000); }
 
 // The browser copy is only for UI state. The server-side HttpOnly cookie is authoritative.
 const Session = {

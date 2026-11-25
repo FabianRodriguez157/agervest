@@ -1,3 +1,4 @@
+import { callFnOne } from '../lib/db';
 import { Router } from 'express';
 import { z } from 'zod';
 import * as ProjectsService from '../services/projects.service';
@@ -43,6 +44,7 @@ router.post('/', authRequired, requireRole('farmer'), verifiedRequired, async (r
 
 router.get('/', async (req, res, next) => {
   try {
+    await callFnOne('fn_expire_campaigns', []).catch(() => null);
     const { crop, risk, status, q } = req.query;
     const list = await ProjectsService.listWithComputedRisk({
       crop: crop as string | undefined,

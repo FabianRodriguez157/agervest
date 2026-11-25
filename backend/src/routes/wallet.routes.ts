@@ -30,10 +30,16 @@ const paySchema = z.object({ transactionId: z.string().uuid() });
 router.post('/pay-return', authRequired, requireRole('farmer', 'ally', 'admin'), async (req, res, next) => {
   try {
     const { transactionId } = paySchema.parse(req.body);
-    const tx = await TransactionsRepo.payReturn(transactionId);
+    const tx = await TransactionsRepo.payReturn(transactionId, req.auth!.sub, req.auth!.role);
     if (!tx) throw BadRequest('No se pudo liquidar la transacción');
     res.json(tx);
   } catch (e) { next(e); }
+});
+
+// Cierra campañas vencidas sin meta completa y reembolsa aportes reservados
+router.post('/expire-campaigns', authRequired, requireRole('ally', 'admin'), async (_req, res, next) => {
+  try { res.json({ closed: await callFnOne<any>('fn_expire_campaigns', []).then(r => Number(r?.fn_expire_campaigns ?? 0)) }); }
+  catch (e) { next(e); }
 });
 
 // Procesa todos los retornos vencidos (demo/cron)
@@ -52,11 +58,13 @@ router.post('/settle-project/:projectId', authRequired, requireRole('ally', 'adm
 const depositSchema = z.object({
   amount: z.coerce.number().positive(),
   bankAccount: z.string().min(5),
+  idempotencyKey: z.string().min(8).max(80).optional(),
 });
 router.post('/deposit', authRequired, async (req, res, next) => {
   try {
-    const { amount, bankAccount } = depositSchema.parse(req.body);
-    const row = await callFnOne<any>('fn_wallet_deposit', [req.auth!.sub, amount, bankAccount]);
+    const { amount, bankAccount, idempotencyKey } = depositSchema.parse(req.body);
+    const key = idempotencyKey ?? (req.header('Idempotency-Key') || null);
+    const row = await callFnOne<any>('fn_wallet_deposit_idem', [req.auth!.sub, amount, bankAccount, key]);
     if (!row) throw BadRequest('No se pudo procesar el depósito');
     res.json({ transactionId: row.tx_id, newBalance: Number(row.new_balance) });
   } catch (e) { next(e); }

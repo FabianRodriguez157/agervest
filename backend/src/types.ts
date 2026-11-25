@@ -130,6 +130,12 @@ export interface Project {
   updatesAccepted: boolean;
   createdAt: Date;
   updatedAt: Date;
+  fundingDeadline?: Date | null;
+  disbursedAt?: Date | null;
+  commissionRate?: number;
+  netToFarmer?: number;
+  periodRatePct?: number;
+  annualEquivalentPct?: number;
 }
 
 export interface Token {
@@ -142,6 +148,7 @@ export interface Token {
 }
 
 export interface Investment {
+  status?: 'reserved' | 'active' | 'refunded';
   id: string;
   investorId: string;
   projectId: string;

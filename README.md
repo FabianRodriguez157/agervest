@@ -58,3 +58,5 @@ Esta versión mantiene la autenticación y operaciones de V0.8 y agrega la capa 
 - documentación de fuentes y métricas del dataset V3 incluida en `data/` y `docs/`.
 
 El backend alternativo PostgreSQL de V3 no se mezcla con el backend TypeScript de V0.8 para evitar dos sistemas de autenticación incompatibles.
+
+> **Implementación canónica:** `backend/` (PostgreSQL, usada por Render). La app de la raíz (`src/`) es heredada y no refleja el modelo vigente. Ver `docs/MODELO_DE_NEGOCIO.md`.

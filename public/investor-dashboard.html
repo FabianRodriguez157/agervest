@@ -181,7 +181,7 @@ async function load() {
       <h3>Tokens adquiridos e historial de inversiones</h3>
       ${investments.length ? `
       <table>
-        <thead><tr><th>Proyecto</th><th>Cultivo</th><th>Monto</th><th>Tokens</th><th>Retorno esperado</th><th>Estado</th><th>Fecha</th></tr></thead>
+        <thead><tr><th>Proyecto</th><th>Cultivo</th><th>Monto</th><th>Tokens</th><th>Pago al cierre</th><th>Estado del aporte</th><th>Fecha</th></tr></thead>
         <tbody>
           ${investments.map(inv => `
           <tr>
@@ -190,7 +190,7 @@ async function load() {
             <td>${fmtMoney(inv.amount)}</td>
             <td>${inv.tokensAcquired.toFixed(2)}</td>
             <td style="color:var(--agv-green);font-weight:600;">${fmtMoney(inv.expectedReturn)}</td>
-            <td><span class="status-pill ${inv.project?.status || 'active'}">${statusLabel(inv.project?.status)}</span></td>
+            <td><span class="status-pill ${inv.status || 'active'}">${investmentStatusLabel(inv.status)}</span></td>
             <td>${fmtDate(inv.createdAt)}</td>
           </tr>`).join('')}
         </tbody>
@@ -488,11 +488,13 @@ async function executeSimApply(toApply) {
   const msg = document.getElementById('simMsg');
   msg.className = 'form-msg';
   let ok = 0; const failed = [];
+  window.__simBatchKey = window.__simBatchKey || newIdempotencyKey();
+  const simBatchKey = window.__simBatchKey;
   for (let i = 0; i < toApply.length; i++) {
     const p = toApply[i];
     msg.textContent = `Procesando inversión ${i + 1} de ${toApply.length}: ${p.title}…`;
     try {
-      await API.post('/api/investments', { projectId: p.id, amount: simAllocations[p.id] });
+      await API.post('/api/investments', { projectId: p.id, amount: simAllocations[p.id], idempotencyKey: simBatchKey + '-' + p.id });
       ok++;
     } catch (e) { failed.push(p.title + ': ' + (e.message || e)); }
   }
@@ -501,7 +503,8 @@ async function executeSimApply(toApply) {
     msg.innerHTML = `${ok} de ${toApply.length} aplicadas. Fallaron:<br>• ${failed.join('<br>• ')}`;
   } else {
     msg.className = 'form-msg ok';
-    msg.textContent = `¡${ok} inversión(es) reales aplicadas! AgerVest retuvo el 6% de comisión por cada una.`;
+    msg.textContent = `¡${ok} aporte(s) reservados! Se desembolsan solo cuando cada campaña completa su meta (comisión 6% únicamente en ese momento); si no, se reembolsan íntegros.`;
+    window.__simBatchKey = null;
   }
   resetAllocations();
   setTimeout(load, 1800);

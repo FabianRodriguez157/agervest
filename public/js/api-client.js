@@ -70,7 +70,7 @@
     async getAllyDashboard(id)                 { return request('GET', `/api/allies/${id}/dashboard`); },
 
     // ------------- Investments -------------
-    async invest(projectId, amount)            { return request('POST', '/api/investments', { projectId, amount }); },
+    async invest(projectId, amount, idempotencyKey) { return request('POST', '/api/investments', { projectId, amount, idempotencyKey }); },
 
     // ------------- Wallet -------------
     async myTransactions()                     { return request('GET',  '/api/wallet/transactions'); },

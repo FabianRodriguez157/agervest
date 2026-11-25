@@ -160,13 +160,9 @@ const verifySchema = z.object({
   bankAccount: z.string().optional(),
 });
 
-router.post('/investor/verify', authRequired, async (req, res, next) => {
-  try {
-    if (req.auth!.role !== 'investor') throw BadRequest('Solo inversionistas pueden verificarse aquí');
-    const data = verifySchema.parse(req.body);
-    const investor = await InvestorsRepo.verify(req.auth!.sub, data);
-    res.json({ user: investor, verified: true, demo: true });
-  } catch (e) { next(e); }
+// Ruta heredada de autoverificación: cerrada. La verificación solo la decide un administrador.
+router.post('/investor/verify', authRequired, (_req, res) => {
+  res.status(410).json({ error: 'La autoverificación fue retirada. Solicita la verificación y espera la decisión del administrador.' });
 });
 
 router.post('/request-verification', authRequired, async (req, res, next) => {

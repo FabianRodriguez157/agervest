@@ -17,6 +17,11 @@ function mapProject(r: any): Project {
     status: r.status, progress: r.progress, featured: r.featured,
     termsAccepted: r.terms_accepted, updatesAccepted: r.updates_accepted,
     createdAt: r.created_at, updatedAt: r.updated_at,
+    fundingDeadline: r.funding_deadline, disbursedAt: r.disbursed_at,
+    commissionRate: 0.06,
+    netToFarmer: Math.round(Number(r.investment_needed) * 0.94 * 100) / 100,
+    periodRatePct: Number(r.expected_return_pct),
+    annualEquivalentPct: Math.round((Math.pow(1 + Number(r.expected_return_pct) / 100, 12 / r.duration_months) - 1) * 10000) / 100,
   };
 }
 

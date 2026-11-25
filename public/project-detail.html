@@ -197,12 +197,18 @@ async function load() {
         <div class="stats-row" style="margin-top:6px;"><span>${pct}% completado</span><span>${investorsCount} inversionista(s)</span></div>
 
         <div class="stats-grid">
-          <div class="stat-box"><div class="v return-tag">+${p.expectedReturnPct}%</div><div class="l">Retorno esperado</div></div>
+          <div class="stat-box"><div class="v return-tag">+${p.expectedReturnPct}%</div><div class="l">Tasa de la campaña (${p.durationMonths} meses)</div></div>
+          <div class="stat-box"><div class="v">${p.annualEquivalentPct ?? '-'}%</div><div class="l">Equivalente anual (referencial)</div></div>
           <div class="stat-box"><div class="v">${statusLabel(p.status)}</div><div class="l">Estado</div></div>
           <div class="stat-box"><div class="v">${p.progress}%</div><div class="l">Avance del cultivo</div></div>
           <div class="stat-box"><div class="v">${token ? fmtMoney(token.price) : '-'}</div><div class="l">Precio por token (${token?.symbol || ''})</div></div>
         </div>
 
+        <div class="info-block" style="font-size:12.5px;margin:10px 0;line-height:1.5;">
+          <strong>Financiamiento todo o nada.</strong> Tu aporte queda <em>reservado</em> hasta completar la meta${p.fundingDeadline ? ` antes del <strong>${fmtDate(p.fundingDeadline)}</strong>${daysLeft(p.fundingDeadline) > 0 ? ` (quedan ${daysLeft(p.fundingDeadline)} días)` : ''}` : ''}.
+          Si la meta se completa, se desembolsan al agricultor ${fmtMoney(p.netToFarmer ?? p.investmentNeeded * 0.94)} (94%) y AgerVest cobra una comisión del 6%. Si no se completa, se te reembolsa el 100% sin comisión.
+          Al final de la campaña recibes capital + ${p.expectedReturnPct}%. Es un préstamo con riesgo: puede haber retrasos o pérdidas.
+        </div>
         <button class="btn btn-primary btn-block" onclick="openModal()" ${p.status !== 'active' ? 'disabled' : ''}>
           ${p.status === 'active' ? '<i data-lucide="coins" class="icon-inline"></i> Invertir en este proyecto' : 'Financiamiento cerrado'}
         </button>
@@ -272,20 +278,23 @@ async function submitInvestment() {
       <h3><i data-lucide="check-circle-2" class="icon-inline"></i> Confirmando inversión</h3>
       <div class="deposit-spinner" style="display:flex;align-items:center;justify-content:center;gap:12px;padding:30px 0;">
         <div class="spinner" style="width:28px;height:28px;border:3px solid #e2e8f0;border-top-color:var(--agv-green);border-radius:50%;animation:dspin 0.8s linear infinite;"></div>
-        <div>Transfiriendo a la billetera del agricultor…</div>
+        <div>Reservando tu aporte en la campaña…</div>
       </div>
     `;
     if (window.lucide) window.lucide.createIcons();
     await new Promise(r => setTimeout(r, 900));
 
     // Paso 3: inversión
-    await AgerVestAPI.invest(projectId, amount);
+    const inv = await AgerVestAPI.invest(projectId, amount, window.__investKey || (window.__investKey = newIdempotencyKey()));
+    window.__investKey = null;
 
     body.innerHTML = `
       <div style="text-align:center;padding:16px 0;">
         <i data-lucide="check-circle-2" style="width:56px;height:56px;color:var(--agv-green);"></i>
-        <h3 style="margin:14px 0 8px;">¡Inversión realizada!</h3>
-        <p style="color:var(--agv-muted);margin:0 0 16px;">Se cargaron <strong>${fmtMoney(amount)}</strong> desde tu cuenta <strong>${bank}</strong> y se transfirieron a la billetera del agricultor. Tu retorno quedó programado.</p>
+        <h3 style="margin:14px 0 8px;">${inv.status === 'active' ? '¡Meta completada!' : '¡Aporte reservado!'}</h3>
+        <p style="color:var(--agv-muted);margin:0 0 16px;">${inv.status === 'active'
+          ? `Con tu aporte de <strong>${fmtMoney(amount)}</strong> la campaña llegó a su meta: los fondos se desembolsaron al agricultor y tu pago quedó programado.`
+          : `Reservamos <strong>${fmtMoney(amount)}</strong> (cuenta ${bank}). Se desembolsarán solo si la campaña completa su meta; si no, se te devuelve el 100%.`}</p>
         <button class="btn btn-primary" onclick="closeModal();load();">Entendido</button>
       </div>
     `;

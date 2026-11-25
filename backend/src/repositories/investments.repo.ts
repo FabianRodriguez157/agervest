@@ -6,13 +6,14 @@ function mapRow(r: any): Investment {
     id: r.id, investorId: r.investor_id, projectId: r.project_id,
     amount: Number(r.amount), tokensAcquired: Number(r.tokens_acquired),
     expectedReturn: Number(r.expected_return), createdAt: r.created_at,
+    status: r.status,
   };
 }
 
 export async function invest(
-  investorId: string, projectId: string, amount: number
+  investorId: string, projectId: string, amount: number, idempotencyKey?: string
 ): Promise<Investment> {
-  const row = await callFnOne('fn_invest', [investorId, projectId, amount]);
+  const row = await callFnOne('fn_invest', [investorId, projectId, amount, idempotencyKey ?? null]);
   if (!row) throw new Error('Investment failed');
   return mapRow(row);
 }

@@ -8,8 +8,8 @@ import { NotFound } from '../lib/errors';
  * incremento de token circulante, guard de sobre-financiamiento) vive en la
  * función fn_invest() de PostgreSQL. Aquí solo se delega.
  */
-export async function invest(investorId: string, projectId: string, amount: number) {
-  return InvestmentsRepo.invest(investorId, projectId, amount);
+export async function invest(investorId: string, projectId: string, amount: number, idempotencyKey?: string) {
+  return InvestmentsRepo.invest(investorId, projectId, amount, idempotencyKey);
 }
 
 export async function getInvestorPortfolio(investorId: string) {

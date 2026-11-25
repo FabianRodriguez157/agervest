@@ -46,8 +46,8 @@ export async function settleProject(projectId: string): Promise<number> {
   return Number(await callFnScalar('fn_settle_project', [projectId]));
 }
 
-export async function payReturn(transactionId: string): Promise<WalletTransaction | null> {
-  const row = await callFnOne<any>('fn_pay_investment_return', [transactionId]);
+export async function payReturn(transactionId: string, actorId: string, actorRole: string): Promise<WalletTransaction | null> {
+  const row = await callFnOne<any>('fn_pay_return_as', [transactionId, actorId, actorRole]);
   if (!row) return null;
   // fn_pay_investment_return devuelve una fila cruda de wallet_transactions
   // (no la vista enriquecida). Rellenamos los joins con null.

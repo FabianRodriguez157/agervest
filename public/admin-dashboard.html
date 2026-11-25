@@ -101,14 +101,14 @@ function render(c, admin, m, farmers, pending, earnings) {
       <div class="card kpi-card"><div class="l">Capital movilizado</div><div class="v">${fmtMoneyLocal(m.totalInvested)}</div><div class="sub">en inversiones completadas</div></div>
     </div>
 
-    <h3 style="margin:28px 0 10px;">Ingresos de AgerVest · comisión ${(es.commissionRate * 100).toFixed(0)}% por inversión</h3>
+    <h3 style="margin:28px 0 10px;">Ingresos de AgerVest · comisión ${(es.commissionRate * 100).toFixed(0)}% cobrada solo al desembolsar campañas que completan su meta</h3>
     <div class="kpi-row">
       <div class="card kpi-card" style="background:linear-gradient(135deg,#1a7d2f 0%,#2aa84a 100%);color:#fff;">
         <div class="l" style="color:rgba(255,255,255,.85);">Total ganado</div>
         <div class="v" style="color:#fff;">${fmtMoneyLocal(es.totalCommission)}</div>
         <div class="sub" style="color:rgba(255,255,255,.75);">de ${fmtMoneyLocal(es.totalGross)} movilizados</div>
       </div>
-      <div class="card kpi-card"><div class="l">Inversiones realizadas</div><div class="v">${es.totalInvestments}</div><div class="sub">cada una genera comisión</div></div>
+      <div class="card kpi-card"><div class="l">Inversiones realizadas</div><div class="v">${es.totalInvestments}</div><div class="sub">aportes de campañas desembolsadas</div></div>
       <div class="card kpi-card"><div class="l">Comisión promedio</div><div class="v">${fmtMoneyLocal(es.averageCommission)}</div><div class="sub">por inversión</div></div>
       <div class="card kpi-card"><div class="l">Pagado a agricultores</div><div class="v">${fmtMoneyLocal(es.totalNetToFarmers)}</div><div class="sub">neto del aporte</div></div>
     </div>

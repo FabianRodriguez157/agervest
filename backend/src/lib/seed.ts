@@ -99,7 +99,7 @@ async function run() {
   console.log('  Aliado: 1 — aliado@agervest.pe / Demo1234');
   console.log('  Admin: 1 — admin@agervest.pe / admin123');
   console.log('  Proyectos: 5 (3 destacados, 1 cerrado con retorno pagado)');
-  console.log('  Billeteras: dinero real movido inversor → agricultor en cada inversión');
+  console.log('  Billeteras: aportes reservados; desembolso solo al completar la meta');
 
   await closePool();
 }

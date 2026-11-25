@@ -7,8 +7,9 @@ import { Forbidden, NotFound } from '../lib/errors';
 
 const router = Router();
 
-router.get('/:id', async (req, res, next) => {
+router.get('/:id', authRequired, async (req, res, next) => {
   try {
+    if (req.auth!.sub !== req.params.id && req.auth!.role !== 'admin') throw Forbidden('Solo puedes consultar tu propio perfil');
     const investor = await InvestorsRepo.findById(req.params.id);
     if (!investor) throw NotFound('Investor not found');
     res.json(investor);
