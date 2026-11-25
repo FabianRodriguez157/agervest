@@ -104,7 +104,7 @@ async function load() {
           </div>
         </div>
         <p style="font-size:12px;color:var(--agv-muted);margin:-10px 0 20px;">
-          Verificación contrastable en <a href="https://sidea.midagri.gob.pe/" target="_blank" rel="noopener" style="color:var(--agv-green);font-weight:700;">SIDEA — MIDAGRI</a> (referencial, simulado en este prototipo).
+          Verificación contrastable en <a href="https://siea.midagri.gob.pe/index.php/herramientas/estadistica-agropecuarias" target="_blank" rel="noopener" style="color:var(--agv-green);font-weight:700;">SIEA — MIDAGRI</a> (referencial, simulado en este prototipo).
         </p>
 
         <div class="project-v3-score-strip"><div><span><i data-lucide="wheat" class="icon-inline"></i> Productor</span><strong>${farmer?.trustScore ?? 0}/100</strong><small>Solidez operativa observada</small></div><div><span><i data-lucide="trending-down" class="icon-inline"></i> Riesgo calculado</span><strong>${ra.riskScorePct}%</strong><small>Menor exposición estimada</small></div><div><span><i data-lucide="shield-check" class="icon-inline"></i> Confianza</span><strong>${Math.round(((farmer?.trustScore ?? 0)+(100-ra.riskScorePct)+(farmer?.validated?100:60))/3)}/100</strong><small>Índice referencial</small></div></div>
