@@ -81,6 +81,12 @@ async function loadDashboard() {
       <div class="card kpi-card"><div class="l">Proyectos activos</div><div class="v">${activeProjects}</div></div>
     </div>
 
+    <div class="dashboard-section-title">
+      <div><h2>Mis proyectos</h2><span class="sub">Gestiona publicaciones, financiamiento y avances agrícolas.</span></div>
+      <a href="register-project.html" class="btn btn-ghost btn-sm">+ Nuevo proyecto</a>
+    </div>
+    <div class="grid grid-3" id="projList" style="margin-bottom:24px;"></div>
+
     ${(pendingObligations && pendingObligations.length) ? `
     <div class="dashboard-section-title"><div><h2>Retornos pendientes de pago</h2><span class="sub">Fechas en que debes devolver capital + ganancia a tus inversionistas.</span></div></div>
     <div class="card" style="padding:16px;margin-bottom:20px;">
@@ -154,11 +160,6 @@ async function loadDashboard() {
 
     <div class="dashboard-section-title"><div><h2>Referencias de mercado y cultivo</h2><span class="sub">Consulta series observadas del cultivo principal de tu perfil y compáralas con Arequipa.</span></div></div>
 <div class="card" style="padding:20px;margin-bottom:24px;"><div id="farmerAnalytics"></div></div>
-<div class="dashboard-section-title">
-      <div><h2>Mis proyectos</h2><span class="sub">Gestiona publicaciones, financiamiento y avances agrícolas.</span></div>
-      <a href="register-project.html" class="btn btn-ghost btn-sm">+ Nuevo proyecto</a>
-    </div>
-    <div class="grid grid-3" id="projList" style="margin-bottom:20px;"></div>
     `;
     if (window.AgerVestAnalytics) AgerVestAnalytics.renderCropPanel('farmerAnalytics', farmer.cropType, true, 'farmer');
     const list = document.getElementById('projList');
